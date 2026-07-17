@@ -56,6 +56,25 @@ export const translations = {
     footer: {
       rights: "All rights reserved.",
     },
+    portfolioDetail: {
+      visitLive: "Visit Live Site",
+      viewSource: "View Source Code",
+      projectOverview: "Project Overview",
+      technologiesUsed: "Technologies Used",
+      wantSimilar: "Want a similar project?",
+      wantSimilarDesc: "I'm currently available for freelance work and would love to help you build your next big idea.",
+      letsTalk: "Let's Talk",
+      noImage: "No Image",
+    },
+    blogDetail: {
+      backToPosts: "Back to all posts",
+      noImage: "No Image",
+    },
+    quote: {
+      label: "My Philosophy",
+      text: '"First, solve the problem. Then, write the code."',
+      author: "— John Johnson",
+    },
   },
   ja: {
     nav: {
@@ -108,6 +127,25 @@ export const translations = {
     footer: {
       rights: "全著作権所有。",
     },
+    portfolioDetail: {
+      visitLive: "ライブサイトを見る",
+      viewSource: "ソースコードを見る",
+      projectOverview: "プロジェクト概要",
+      technologiesUsed: "使用技術",
+      wantSimilar: "同様のプロジェクトを希望しますか？",
+      wantSimilarDesc: "現在フリーランスの仕事を受け付けており、あなたの次の大きなアイデアを実現するお手伝いをしたいと思っています。",
+      letsTalk: "話しましょう",
+      noImage: "画像なし",
+    },
+    blogDetail: {
+      backToPosts: "記事一覧に戻る",
+      noImage: "画像なし",
+    },
+    quote: {
+      label: "私の哲学",
+      text: "「まず問題を解決する。そのあとでコードを書く。」",
+      author: "— ジョン・ジョンソン",
+    },
   },
 };
 
@@ -125,10 +163,12 @@ const LanguageContext = createContext<LanguageContextType>({
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Language>("en");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("lang") as Language;
     if (saved === "en" || saved === "ja") setLangState(saved);
+    setMounted(true);
   }, []);
 
   const setLang = (l: Language) => {
@@ -136,8 +176,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("lang", l);
   };
 
+  // Use "en" translations during SSR to avoid hydration mismatch.
+  // After mount the real stored language kicks in.
+  const t = mounted ? translations[lang] : translations.en;
+
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t: translations[lang] }}>
+    <LanguageContext.Provider value={{ lang: mounted ? lang : "en", setLang, t }}>
       {children}
     </LanguageContext.Provider>
   );

@@ -1,12 +1,18 @@
 import { getData } from "@/lib/data";
 import Link from "next/link";
 import { DeleteBlogButton } from "./DeleteBlogButton";
+import { Suspense } from "react";
+import SaveNotification from "@/components/SaveNotification";
 
 export default async function AdminBlogsPage() {
   const data = await getData();
 
   return (
     <div>
+      <Suspense fallback={null}>
+        <SaveNotification message="Blog post saved successfully!" />
+      </Suspense>
+
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Blog Posts</h1>

@@ -1,5 +1,6 @@
 import { db } from "./firebase";
 import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
+import { cache } from "react";
 
 export type ThemeColors = {
   bgPrimary: string;
@@ -78,6 +79,17 @@ export type LandingLanguageContent = {
   about: AboutContent;
 };
 
+export type ContactContent = {
+  location: string;
+  email: string;
+  tag_en: string;
+  title_en: string;
+  subtitle_en: string;
+  tag_ja: string;
+  title_ja: string;
+  subtitle_ja: string;
+};
+
 export type SiteData = {
   landing: {
     en: LandingLanguageContent;
@@ -88,9 +100,9 @@ export type SiteData = {
       quoteBg: string;
     };
   };
+  contact: ContactContent;
   blogs: BlogPost[];
   portfolio: PortfolioItem[];
-  messages: Message[];
   theme: ThemeColors;
   lightTheme: ThemeColors;
 };
@@ -119,6 +131,17 @@ export const defaultLightTheme: ThemeColors = {
   borderColor: "#E5E7EB",
 };
 
+export const defaultContact: ContactContent = {
+  location: "Hiroshima, Japan",
+  email: "info.abhashk@gmail.com",
+  tag_en: "Get in touch",
+  title_en: "Let's Connect",
+  subtitle_en: "Open to internships, freelance work, and collaboration on interesting projects. Have an idea? Let's build it together.",
+  tag_ja: "お気軽にどうぞ",
+  title_ja: "ご連絡ください",
+  subtitle_ja: "インターンシップ、フリーランス、プロジェクトのコラボレーションを受け付けています。アイデアがあればぜひ一緒に作りましょう。",
+};
+
 const defaultLanguageContent: LandingLanguageContent = {
   hero: { tagline: "", title: "", subtitle: "", ctaText: "" },
   about: { tag: "", title: "", bio1: "", bio2: "", bio3: "", gpa: "", projects: "", certs: "" }
@@ -134,27 +157,38 @@ const defaultLanding = {
   }
 };
 
-export async function getData(): Promise<SiteData> {
+export const getData = cache(async (): Promise<SiteData> => {
   const data: SiteData = {
     landing: defaultLanding,
+    contact: defaultContact,
     blogs: [],
     portfolio: [],
-    messages: [],
     theme: defaultTheme,
     lightTheme: defaultLightTheme,
   };
 
   try {
-    // Fetch Landing
-    const landingDoc = await getDoc(doc(db, "site", "landing"));
+    const [
+      landingDoc,
+      blogsSnapshot,
+      portfolioSnapshot,
+      contactDoc,
+      themeDoc
+    ] = await Promise.all([
+      getDoc(doc(db, "site", "landing")),
+      getDocs(collection(db, "blogs")),
+      getDocs(collection(db, "portfolio")),
+      getDoc(doc(db, "site", "contact")),
+      getDoc(doc(db, "site", "theme"))
+    ]);
+
+    // Parse Landing
     if (landingDoc.exists()) {
       const dbData = landingDoc.data();
-      
-      // Migration check: if 'en' doesn't exist but 'hero' does, it's the old schema.
       if (!dbData.en && dbData.hero) {
         data.landing = {
           en: { hero: dbData.hero, about: dbData.about },
-          ja: { hero: dbData.hero, about: dbData.about }, // copy English over temporarily
+          ja: { hero: dbData.hero, about: dbData.about },
           images: dbData.images || defaultLanding.images,
         };
       } else {
@@ -162,11 +196,9 @@ export async function getData(): Promise<SiteData> {
       }
     }
 
-    // Fetch Blogs
-    const blogsSnapshot = await getDocs(collection(db, "blogs"));
+    // Parse Blogs
     blogsSnapshot.forEach((doc) => {
       const p = doc.data();
-      // Migration check
       if (p.title && !p.title_en) {
         p.title_en = p.title; p.title_ja = p.title;
         p.excerpt_en = p.excerpt; p.excerpt_ja = p.excerpt;
@@ -175,11 +207,9 @@ export async function getData(): Promise<SiteData> {
       data.blogs.push(p as BlogPost);
     });
 
-    // Fetch Portfolio
-    const portfolioSnapshot = await getDocs(collection(db, "portfolio"));
+    // Parse Portfolio
     portfolioSnapshot.forEach((doc) => {
       const p = doc.data();
-      // Migration check
       if (p.title && !p.title_en) {
         p.title_en = p.title; p.title_ja = p.title;
         p.overview_en = p.overview; p.overview_ja = p.overview;
@@ -187,14 +217,12 @@ export async function getData(): Promise<SiteData> {
       data.portfolio.push(p as PortfolioItem);
     });
 
-    // Fetch Messages
-    const messagesSnapshot = await getDocs(collection(db, "messages"));
-    messagesSnapshot.forEach((doc) => {
-      data.messages.push(doc.data() as Message);
-    });
+    // Parse Contact
+    if (contactDoc.exists()) {
+      data.contact = { ...defaultContact, ...contactDoc.data() } as ContactContent;
+    }
 
-    // Fetch Theme
-    const themeDoc = await getDoc(doc(db, "site", "theme"));
+    // Parse Theme
     if (themeDoc.exists()) {
       const dbTheme = themeDoc.data();
       if (dbTheme.dark && dbTheme.light) {
@@ -208,10 +236,23 @@ export async function getData(): Promise<SiteData> {
     // Sort arrays by id (timestamp) descending
     data.blogs.sort((a, b) => b.id - a.id);
     data.portfolio.sort((a, b) => b.id - a.id);
-    data.messages.sort((a, b) => b.id - a.id);
   } catch (error) {
     console.error("Error fetching data from Firestore:", error);
   }
 
   return data;
-}
+});
+
+export const getMessages = cache(async (): Promise<Message[]> => {
+  const messages: Message[] = [];
+  try {
+    const messagesSnapshot = await getDocs(collection(db, "messages"));
+    messagesSnapshot.forEach((doc) => {
+      messages.push(doc.data() as Message);
+    });
+    messages.sort((a, b) => b.id - a.id);
+  } catch (error) {
+    console.error("Error fetching messages from Firestore:", error);
+  }
+  return messages;
+});

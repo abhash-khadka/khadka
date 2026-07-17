@@ -1,4 +1,4 @@
-import { getData } from "@/lib/data";
+import { getData, getMessages } from "@/lib/data";
 import Link from "next/link";
 
 const BlogIcon = () => (
@@ -32,9 +32,12 @@ const LandingIcon = () => (
 );
 
 export default async function AdminDashboard() {
-  const data = await getData();
+  const [data, messages] = await Promise.all([
+    getData(),
+    getMessages(),
+  ]);
 
-  const unreadMessages = data.messages ? data.messages.filter((m) => !m.read).length : 0;
+  const unreadMessages = messages ? messages.filter((m) => !m.read).length : 0;
 
   const stats = [
     { label: "Blog Posts",       value: data.blogs.length,     href: "/admin/blogs",     icon: <BlogIcon />,      color: "text-blue-400",   bg: "bg-blue-400/10" },

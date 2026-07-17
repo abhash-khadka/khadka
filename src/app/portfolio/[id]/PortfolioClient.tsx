@@ -6,7 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import ImageModal from "@/components/ImageModal";
 
 export default function PortfolioClient({ project }: { project: PortfolioItem }) {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const title = (project[`title_${lang}` as keyof PortfolioItem] as string) || project.title_en;
   const overview = (project[`overview_${lang}` as keyof PortfolioItem] as string) || project.overview_en;
 
@@ -34,7 +34,7 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
               <ImageModal src={project.image} alt={title} />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="text-3xl font-bold opacity-30" style={{ color: "var(--text-secondary)" }}>No Image</span>
+                <span className="text-3xl font-bold opacity-30" style={{ color: "var(--text-secondary)" }}>{t.portfolioDetail.noImage}</span>
               </div>
             )}
           </div>
@@ -54,7 +54,7 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
                   className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-bold transition-colors shadow-lg"
                   style={{ background: "var(--text-primary)", color: "var(--bg-primary)" }}
                 >
-                  Visit Live Site
+                  {t.portfolioDetail.visitLive}
                   <span className="text-lg leading-none">↗</span>
                 </a>
               )}
@@ -66,7 +66,7 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
                   className="flex items-center justify-center gap-2 w-full sm:w-auto border px-8 py-3.5 rounded-full text-sm font-bold transition-colors"
                   style={{ background: "transparent", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
                 >
-                  View Source Code
+                  {t.portfolioDetail.viewSource}
                   <span className="text-lg leading-none">↗</span>
                 </a>
               )}
@@ -77,7 +77,7 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
           <div className="mb-16">
             <h2 className="text-sm font-semibold tracking-widest uppercase mb-6 flex items-center gap-3" style={{ color: "var(--text-secondary)" }}>
               <span className="w-2 h-2 rounded-full" style={{ background: "var(--color-accent)" }}></span>
-              Project Overview
+              {t.portfolioDetail.projectOverview}
             </h2>
             <div
               className="prose prose-lg max-w-none leading-relaxed"
@@ -97,7 +97,7 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
           <div className="mb-16">
             <h2 className="text-sm font-semibold tracking-widest uppercase mb-6 flex items-center gap-3" style={{ color: "var(--text-secondary)" }}>
               <span className="w-2 h-2 rounded-full" style={{ background: "var(--color-accent)" }}></span>
-              Technologies Used
+              {t.portfolioDetail.technologiesUsed}
             </h2>
             <div className="flex flex-wrap gap-3">
               {project.technologies.map((tech) => (
@@ -117,12 +117,12 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
             <div className="absolute top-0 right-0 p-6 opacity-5 transform rotate-12 scale-150" style={{ color: "var(--text-primary)" }}>
               <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2z"/></svg>
             </div>
-            <h3 className="font-bold mb-3 text-xl relative z-10" style={{ color: "var(--text-primary)" }}>Want a similar project?</h3>
+            <h3 className="font-bold mb-3 text-xl relative z-10" style={{ color: "var(--text-primary)" }}>{t.portfolioDetail.wantSimilar}</h3>
             <p className="text-sm mb-8 leading-relaxed max-w-sm relative z-10" style={{ color: "var(--text-secondary)" }}>
-              I'm currently available for freelance work and would love to help you build your next big idea.
+              {t.portfolioDetail.wantSimilarDesc}
             </p>
             <Link href="/contact" className="relative z-10 inline-flex items-center gap-3 px-6 py-2.5 rounded-full text-sm font-bold tracking-widest uppercase transition-colors shadow-lg" style={{ background: "var(--color-accent)", color: "var(--bg-primary)" }}>
-              Let's Talk
+              {t.portfolioDetail.letsTalk}
               <span className="text-lg leading-none">→</span>
             </Link>
           </div>

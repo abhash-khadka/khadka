@@ -1,5 +1,6 @@
 import { getData } from "@/lib/data";
 import LandingForm from "./LandingForm";
+import { Suspense } from "react";
 
 export default async function AdminLandingPage() {
   const data = await getData();
@@ -11,7 +12,9 @@ export default async function AdminLandingPage() {
         <p className="text-gray-500 text-sm">Switch between English and Japanese tabs to edit the content for each language. Changes here will reflect instantly on your live site.</p>
       </div>
       
-      <LandingForm data={data.landing} />
+      <Suspense fallback={null}>
+        <LandingForm data={data.landing} />
+      </Suspense>
     </div>
   );
 }

@@ -20,7 +20,7 @@ export default async function Home() {
       <About data={data.landing} />
       <Quote data={data.landing} />
       <Blog posts={data.blogs.filter((b) => b.published)} />
-      <Contact />
+      <Contact data={data.contact} />
     </>
   );
 }

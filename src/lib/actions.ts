@@ -91,7 +91,7 @@ export async function createBlogPost(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/blogs");
-  redirect("/admin/blogs");
+  redirect("/admin/blogs?saved=1");
 }
 
 export async function updateBlogPost(id: number, formData: FormData) {
@@ -125,7 +125,7 @@ export async function updateBlogPost(id: number, formData: FormData) {
   revalidatePath("/");
   revalidatePath("/blogs");
   revalidatePath(`/blogs/${slug}`);
-  redirect("/admin/blogs");
+  redirect("/admin/blogs?saved=1");
 }
 
 export async function deleteBlogPost(id: number, slug?: string) {
@@ -157,7 +157,7 @@ export async function createPortfolioItem(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/portfolio");
-  redirect("/admin/portfolio");
+  redirect("/admin/portfolio?saved=1");
 }
 
 export async function updatePortfolioItem(id: number, formData: FormData) {
@@ -179,7 +179,7 @@ export async function updatePortfolioItem(id: number, formData: FormData) {
   revalidatePath("/");
   revalidatePath("/portfolio");
   revalidatePath(`/portfolio/${id}`);
-  redirect("/admin/portfolio");
+  redirect("/admin/portfolio?saved=1");
 }
 
 export async function deletePortfolioItem(id: number) {
@@ -224,7 +224,7 @@ export async function updateLandingContent(formData: FormData) {
   await setDoc(doc(db, "site", "landing"), landingData);
 
   revalidatePath("/");
-  redirect("/admin");
+  redirect("/admin/landing?saved=1");
 }
 
 // ─── MESSAGES ─────────────────────────────────────────────────────────────────
@@ -267,7 +267,7 @@ export async function markMessageReplied(id: number) {
 
 // ─── THEME ───────────────────────────────────────────────────────────────────
 
-export async function updateThemeColors(formData: FormData) {
+export async function updateThemeColors(formData: FormData): Promise<{ success: boolean }> {
   const theme = {
     dark: {
       bgPrimary: formData.get("dark_bgPrimary") as string,
@@ -298,6 +298,7 @@ export async function updateThemeColors(formData: FormData) {
   revalidatePath("/blogs");
   revalidatePath("/contact");
   revalidatePath("/about");
+  return { success: true };
 }
 
 // ─── TRANSLATION (Google AI Studio) ────────────────────────────────────────
@@ -352,4 +353,21 @@ Text to translate:
     if (error instanceof Error) return `Error: Could not translate. ${error.message}`;
     return `Error: Could not translate.`;
   }
+}
+
+export async function updateContactContent(formData: FormData) {
+  const contact = {
+    location:    (formData.get("location")    as string) || "",
+    email:       (formData.get("email")       as string) || "",
+    tag_en:      (formData.get("tag_en")      as string) || "",
+    title_en:    (formData.get("title_en")    as string) || "",
+    subtitle_en: (formData.get("subtitle_en") as string) || "",
+    tag_ja:      (formData.get("tag_ja")      as string) || "",
+    title_ja:    (formData.get("title_ja")    as string) || "",
+    subtitle_ja: (formData.get("subtitle_ja") as string) || "",
+  };
+  await setDoc(doc(db, "site", "contact"), contact);
+  revalidatePath("/");
+  revalidatePath("/contact");
+  redirect("/admin/contact?saved=1");
 }

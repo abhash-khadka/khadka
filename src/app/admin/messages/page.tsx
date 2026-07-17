@@ -1,9 +1,8 @@
-import { getData } from "@/lib/data";
+import { getMessages } from "@/lib/data";
 import { MessageCard } from "./MessageCard";
 
 export default async function AdminMessagesPage() {
-  const data = await getData();
-  const messages = data.messages || [];
+  const messages = await getMessages();
 
   return (
     <div className="max-w-4xl">

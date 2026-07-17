@@ -4,11 +4,18 @@ import { sendMessage } from "@/lib/actions";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ContactContent } from "@/lib/data";
 
-function ContactForm() {
+function ContactForm({ data }: { data?: ContactContent }) {
   const searchParams = useSearchParams();
   const sent = searchParams.get("sent") === "1";
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  
+  const tag = data ? (lang === "ja" ? data.tag_ja : data.tag_en) : t.contact.tag;
+  const title = data ? (lang === "ja" ? data.title_ja : data.title_en) : t.contact.title;
+  const subtitle = data ? (lang === "ja" ? data.subtitle_ja : data.subtitle_en) : t.contact.subtitle;
+  const location = data?.location || "Hiroshima, Japan";
+  const email = data?.email || "info.abhashk@gmail.com";
 
   return (
     <section id="contact" className="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 lg:px-8" style={{ background: "var(--bg-secondary)" }}>
@@ -17,13 +24,13 @@ function ContactForm() {
           {/* Left side: Contact Info */}
           <div className="w-full lg:w-1/3">
             <p className="font-medium tracking-[3px] sm:tracking-[4px] text-[10px] sm:text-xs uppercase mb-3 sm:mb-4" style={{ color: "var(--color-accent)" }}>
-              {t.contact.tag}
+              {tag}
             </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-6 sm:mb-8 leading-tight" style={{ color: "var(--text-primary)" }}>
-              {t.contact.title}
+              {title}
             </h2>
             <p className="text-sm sm:text-[15px] leading-relaxed mb-8 sm:mb-10 md:mb-12 max-w-md" style={{ color: "var(--text-secondary)" }}>
-              {t.contact.subtitle}
+              {subtitle}
             </p>
             
             <div className="space-y-8">
@@ -36,7 +43,7 @@ function ContactForm() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1" style={{ color: "var(--text-primary)" }}>{t.contact.location}</h4>
-                  <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Hiroshima, Japan</p>
+                  <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{location}</p>
                 </div>
               </div>
               
@@ -48,7 +55,7 @@ function ContactForm() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1" style={{ color: "var(--text-primary)" }}>{t.contact.email}</h4>
-                  <p className="text-sm" style={{ color: "var(--text-secondary)" }}>info.abhashk@gmail.com</p>
+                  <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{email}</p>
                 </div>
               </div>
             </div>
@@ -119,10 +126,10 @@ function ContactForm() {
   );
 }
 
-export default function Contact() {
+export default function Contact({ data }: { data?: ContactContent }) {
   return (
     <Suspense fallback={null}>
-      <ContactForm />
+      <ContactForm data={data} />
     </Suspense>
   );
 }

@@ -1,13 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SiteData } from "@/lib/data";
 import { updateLandingContent } from "@/lib/actions";
-import TranslateButton from "@/components/TranslateButton";
+import SaveAlert from "@/components/SaveAlert";
+import FieldWithButton, { SmallFieldWithButton } from "./FieldWithButton";
 
 export default function LandingForm({ data }: { data: SiteData["landing"] }) {
   const [tab, setTab] = useState<"en" | "ja">("en");
+  const searchParams = useSearchParams();
+  const [showAlert, setShowAlert] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("saved") === "1") {
+      setShowAlert(true);
+    }
+  }, [searchParams]);
 
   const [tagline_en, setTaglineEn] = useState("");
   const [title_en, setTitleEn] = useState("");
@@ -41,31 +51,35 @@ export default function LandingForm({ data }: { data: SiteData["landing"] }) {
 
   useEffect(() => {
     if (data) {
-      setTaglineEn(data.en.hero.tagline);
-      setTitleEn(data.en.hero.title);
-      setSubtitleEn(data.en.hero.subtitle);
-      setCtaTextEn(data.en.hero.ctaText);
-      setAboutTagEn(data.en.about.tag);
-      setAboutTitleEn(data.en.about.title);
-      setBio1En(data.en.about.bio1);
-      setBio2En(data.en.about.bio2);
-      setBio3En(data.en.about.bio3);
-      setGpaEn(data.en.about.gpa);
-      setProjectsCountEn(data.en.about.projects);
-      setCertsEn(data.en.about.certs);
+      setTaglineEn(data.en.hero.tagline ?? "");
+      setTitleEn(data.en.hero.title ?? "");
+      setSubtitleEn(data.en.hero.subtitle ?? "");
+      setCtaTextEn(data.en.hero.ctaText ?? "");
+      setAboutTagEn(data.en.about.tag ?? "");
+      setAboutTitleEn(data.en.about.title ?? "");
+      setBio1En(data.en.about.bio1 ?? "");
+      setBio2En(data.en.about.bio2 ?? "");
+      setBio3En(data.en.about.bio3 ?? "");
+      setGpaEn(data.en.about.gpa ?? "");
+      setProjectsCountEn(data.en.about.projects ?? "");
+      setCertsEn(data.en.about.certs ?? "");
 
-      setTaglineJa(data.ja.hero.tagline);
-      setTitleJa(data.ja.hero.title);
-      setSubtitleJa(data.ja.hero.subtitle);
-      setCtaTextJa(data.ja.hero.ctaText);
-      setAboutTagJa(data.ja.about.tag);
-      setAboutTitleJa(data.ja.about.title);
-      setBio1Ja(data.ja.about.bio1);
-      setBio2Ja(data.ja.about.bio2);
-      setBio3Ja(data.ja.about.bio3);
-      setGpaJa(data.ja.about.gpa);
-      setProjectsCountJa(data.ja.about.projects);
-      setCertsJa(data.ja.about.certs);
+      setTaglineJa(data.ja.hero.tagline ?? "");
+      setTitleJa(data.ja.hero.title ?? "");
+      setSubtitleJa(data.ja.hero.subtitle ?? "");
+      setCtaTextJa(data.ja.hero.ctaText ?? "");
+      setAboutTagJa(data.ja.about.tag ?? "");
+      setAboutTitleJa(data.ja.about.title ?? "");
+      setBio1Ja(data.ja.about.bio1 ?? "");
+      setBio2Ja(data.ja.about.bio2 ?? "");
+      setBio3Ja(data.ja.about.bio3 ?? "");
+      setGpaJa(data.ja.about.gpa ?? "");
+      setProjectsCountJa(data.ja.about.projects ?? "");
+      setCertsJa(data.ja.about.certs ?? "");
+
+      setHeroBgUrl(data.images?.heroBg ?? "");
+      setAboutImgUrl(data.images?.aboutImg ?? "");
+      setQuoteBgUrl(data.images?.quoteBg ?? "");
     }
   }, [data]);
 
@@ -133,7 +147,14 @@ export default function LandingForm({ data }: { data: SiteData["landing"] }) {
   };
 
   return (
-    <form action={updateLandingContent} className="space-y-10">
+    <>
+      {showAlert && (
+        <SaveAlert
+          message="Landing page saved successfully!"
+          onDismiss={() => setShowAlert(false)}
+        />
+      )}
+      <form action={updateLandingContent} className="space-y-10">
       <input type="hidden" name="tagline_en" value={tagline_en || ""} />
       <input type="hidden" name="title_en" value={title_en || ""} />
       <input type="hidden" name="subtitle_en" value={subtitle_en || ""} />
@@ -236,6 +257,7 @@ export default function LandingForm({ data }: { data: SiteData["landing"] }) {
         </Link>
       </div>
     </form>
+    </>
   );
 }
 
@@ -282,32 +304,4 @@ function SmallField({ label, name, value, onChange }: { label: string; name: str
       />
     </div>
   );
-}
-
-function FieldWithButton({ label, name, value, onChange, onTranslate, sourceLang, targetLang, textarea = false }: { label: string; name: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void; onTranslate: (text: string) => void; sourceLang: string; targetLang: string; textarea?: boolean; }) {
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-3">
-        <label className="block text-xs font-semibold text-gray-400 tracking-widest uppercase">{label}</label>
-        <TranslateButton text={value} sourceLanguage={sourceLang} targetLanguage={targetLang} onTranslated={onTranslate} />
-      </div>
-      {textarea ? (
-        <textarea name={name} value={value} onChange={onChange} rows={3} className="w-full bg-[#0a0a0a] border border-gray-800 text-white px-4 py-3 text-sm focus:outline-none focus:border-[#c9a84c] transition-colors rounded-sm resize-none" />
-      ) : (
-        <input type="text" name={name} value={value} onChange={onChange} className="w-full bg-[#0a0a0a] border border-gray-800 text-white px-4 py-3 text-sm focus:outline-none focus:border-[#c9a84c] transition-colors rounded-sm" />
-      )}
-    </div>
-  )
-}
-
-function SmallFieldWithButton({ label, name, value, onChange, onTranslate, sourceLang, targetLang }: { label: string; name: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; onTranslate: (text: string) => void; sourceLang: string; targetLang: string; }) {
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-3">
-        <label className="block text-xs font-semibold text-gray-400 tracking-widest uppercase">{label}</label>
-        <TranslateButton text={value} sourceLanguage={sourceLang} targetLanguage={targetLang} onTranslated={onTranslate} />
-      </div>
-      <input type="text" name={name} value={value} onChange={onChange} className="w-full bg-[#0a0a0a] border border-gray-800 text-white px-3 py-2.5 text-sm focus:outline-none focus:border-[#c9a84c] transition-colors rounded-sm" />
-    </div>
-  )
 }
