@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <main className="pt-24 min-h-screen flex items-center bg-[#0a0a0a]">
+    <main className="pt-24 min-h-screen flex items-center bg-background">
       <div className="w-full">
         <Contact />
       </div>
