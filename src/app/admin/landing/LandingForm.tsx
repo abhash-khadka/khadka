@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SiteData } from "@/lib/data";
-import { updateLandingContent } from "@/lib/actions";
+import { updateLandingContent, translateText } from "@/lib/actions";
 import SaveAlert from "@/components/SaveAlert";
 import FieldWithButton, { SmallFieldWithButton } from "./FieldWithButton";
 
@@ -48,6 +48,49 @@ export default function LandingForm({ data }: { data: SiteData["landing"] }) {
   const [heroBgUrl, setHeroBgUrl] = useState("");
   const [aboutImgUrl, setAboutImgUrl] = useState("");
   const [quoteBgUrl, setQuoteBgUrl] = useState("");
+  const [isTranslatingAll, setIsTranslatingAll] = useState(false);
+
+  const handleTranslateAllToJa = async () => {
+    setIsTranslatingAll(true);
+    try {
+      if (tagline_en && !tagline_ja) setTaglineJa(await translateText(tagline_en, "English", "Japanese"));
+      if (title_en && !title_ja) setTitleJa(await translateText(title_en, "English", "Japanese"));
+      if (subtitle_en && !subtitle_ja) setSubtitleJa(await translateText(subtitle_en, "English", "Japanese"));
+      if (ctaText_en && !ctaText_ja) setCtaTextJa(await translateText(ctaText_en, "English", "Japanese"));
+      if (aboutTag_en && !aboutTag_ja) setAboutTagJa(await translateText(aboutTag_en, "English", "Japanese"));
+      if (aboutTitle_en && !aboutTitle_ja) setAboutTitleJa(await translateText(aboutTitle_en, "English", "Japanese"));
+      if (bio1_en && !bio1_ja) setBio1Ja(await translateText(bio1_en, "English", "Japanese"));
+      if (bio2_en && !bio2_ja) setBio2Ja(await translateText(bio2_en, "English", "Japanese"));
+      if (bio3_en && !bio3_ja) setBio3Ja(await translateText(bio3_en, "English", "Japanese"));
+      if (gpa_en && !gpa_ja) setGpaJa(await translateText(gpa_en, "English", "Japanese"));
+      if (projectsCount_en && !projectsCount_ja) setProjectsCountJa(await translateText(projectsCount_en, "English", "Japanese"));
+      if (certs_en && !certs_ja) setCertsJa(await translateText(certs_en, "English", "Japanese"));
+      setTab("ja");
+    } finally {
+      setIsTranslatingAll(false);
+    }
+  };
+
+  const handleTranslateAllToEn = async () => {
+    setIsTranslatingAll(true);
+    try {
+      if (tagline_ja && !tagline_en) setTaglineEn(await translateText(tagline_ja, "Japanese", "English"));
+      if (title_ja && !title_en) setTitleEn(await translateText(title_ja, "Japanese", "English"));
+      if (subtitle_ja && !subtitle_en) setSubtitleEn(await translateText(subtitle_ja, "Japanese", "English"));
+      if (ctaText_ja && !ctaText_en) setCtaTextEn(await translateText(ctaText_ja, "Japanese", "English"));
+      if (aboutTag_ja && !aboutTag_en) setAboutTagEn(await translateText(aboutTag_ja, "Japanese", "English"));
+      if (aboutTitle_ja && !aboutTitle_en) setAboutTitleEn(await translateText(aboutTitle_ja, "Japanese", "English"));
+      if (bio1_ja && !bio1_en) setBio1En(await translateText(bio1_ja, "Japanese", "English"));
+      if (bio2_ja && !bio2_en) setBio2En(await translateText(bio2_ja, "Japanese", "English"));
+      if (bio3_ja && !bio3_en) setBio3En(await translateText(bio3_ja, "Japanese", "English"));
+      if (gpa_ja && !gpa_en) setGpaEn(await translateText(gpa_ja, "Japanese", "English"));
+      if (projectsCount_ja && !projectsCount_en) setProjectsCountEn(await translateText(projectsCount_ja, "Japanese", "English"));
+      if (certs_ja && !certs_en) setCertsEn(await translateText(certs_ja, "Japanese", "English"));
+      setTab("en");
+    } finally {
+      setIsTranslatingAll(false);
+    }
+  };
 
   useEffect(() => {
     if (data) {
@@ -181,25 +224,48 @@ export default function LandingForm({ data }: { data: SiteData["landing"] }) {
       <input type="hidden" name="certs_ja" value={certs_ja || ""} />
       
       {/* Language Tabs */}
-      <div className="flex border-b border-gray-800 mb-6">
-        <button
-          type="button"
-          onClick={() => setTab("en")}
-          className={`px-6 py-3 font-semibold tracking-widest text-sm transition-colors ${
-            tab === "en" ? "border-b-2 border-[#c9a84c] text-white" : "text-gray-500 hover:text-gray-300"
-          }`}
-        >
-          ENGLISH
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("ja")}
-          className={`px-6 py-3 font-semibold tracking-widest text-sm transition-colors ${
-            tab === "ja" ? "border-b-2 border-[#c9a84c] text-white" : "text-gray-500 hover:text-gray-300"
-          }`}
-        >
-          JAPANESE (日本語)
-        </button>
+      <div className="flex items-center justify-between border-b border-gray-800 mb-6">
+        <div className="flex">
+          <button
+            type="button"
+            onClick={() => setTab("en")}
+            className={`px-6 py-3 font-semibold tracking-widest text-sm transition-colors ${
+              tab === "en" ? "border-b-2 border-[#c9a84c] text-white" : "text-gray-500 hover:text-gray-300"
+            }`}
+          >
+            ENGLISH
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("ja")}
+            className={`px-6 py-3 font-semibold tracking-widest text-sm transition-colors ${
+              tab === "ja" ? "border-b-2 border-[#c9a84c] text-white" : "text-gray-500 hover:text-gray-300"
+            }`}
+          >
+            JAPANESE (日本語)
+          </button>
+        </div>
+        
+        {tab === "en" && (
+          <button
+            type="button"
+            onClick={handleTranslateAllToJa}
+            disabled={isTranslatingAll}
+            className="bg-purple-600 text-white px-4 py-2 text-sm font-semibold rounded-sm transition-colors hover:bg-purple-700 disabled:bg-gray-600 mb-2"
+          >
+            {isTranslatingAll ? "Translating..." : "Auto-Translate to Japanese"}
+          </button>
+        )}
+        {tab === "ja" && (
+          <button
+            type="button"
+            onClick={handleTranslateAllToEn}
+            disabled={isTranslatingAll}
+            className="bg-purple-600 text-white px-4 py-2 text-sm font-semibold rounded-sm transition-colors hover:bg-purple-700 disabled:bg-gray-600 mb-2"
+          >
+            {isTranslatingAll ? "Translating..." : "Auto-Translate to English"}
+          </button>
+        )}
       </div>
 
       {renderLanguageSection("en")}

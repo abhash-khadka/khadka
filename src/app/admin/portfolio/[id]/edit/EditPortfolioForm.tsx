@@ -19,18 +19,23 @@ export default function EditPortfolioForm({ item, action }: { item: any; action:
   const [overview_ja, setOverviewJa] = useState(item.overview_ja || "");
   const [isTranslatingAll, setIsTranslatingAll] = useState(false);
 
-  const handleTranslateAll = async () => {
+  const handleTranslateAllToJa = async () => {
     setIsTranslatingAll(true);
     try {
-      if (title_en && !title_ja) {
-        const translatedTitle = await translateText(title_en, "English", "Japanese");
-        setTitleJa(translatedTitle);
-      }
-      if (overview_en && !overview_ja) {
-        const translatedOverview = await translateText(overview_en, "English", "Japanese");
-        setOverviewJa(translatedOverview);
-      }
-      setLang("ja"); // switch to Japanese tab to see results
+      if (title_en && !title_ja) setTitleJa(await translateText(title_en, "English", "Japanese"));
+      if (overview_en && !overview_ja) setOverviewJa(await translateText(overview_en, "English", "Japanese"));
+      setLang("ja");
+    } finally {
+      setIsTranslatingAll(false);
+    }
+  };
+
+  const handleTranslateAllToEn = async () => {
+    setIsTranslatingAll(true);
+    try {
+      if (title_ja && !title_en) setTitleEn(await translateText(title_ja, "Japanese", "English"));
+      if (overview_ja && !overview_en) setOverviewEn(await translateText(overview_ja, "Japanese", "English"));
+      setLang("en");
     } finally {
       setIsTranslatingAll(false);
     }
@@ -46,38 +51,51 @@ export default function EditPortfolioForm({ item, action }: { item: any; action:
           <h1 className="text-3xl font-bold text-white">Edit Portfolio Item</h1>
         </div>
         
-        {lang === "en" && (
-          <button
-            type="button"
-            onClick={handleTranslateAll}
-            disabled={isTranslatingAll || (!title_en && !overview_en)}
-            className="bg-purple-600 text-white px-4 py-2 text-sm font-semibold rounded-sm transition-colors hover:bg-purple-700 disabled:bg-gray-600"
-          >
-            {isTranslatingAll ? "Translating All..." : "Auto-Translate to Japanese"}
-          </button>
-        )}
       </div>
 
       {/* Language Tabs */}
-      <div className="mb-6 flex gap-2">
-        <button
-          type="button"
-          onClick={() => setLang("en")}
-          className={`px-4 py-2 text-sm font-semibold rounded-sm transition-colors ${
-            lang === "en" ? "bg-[#c9a84c] text-black" : "bg-[#1c1c1c] text-gray-400 hover:bg-[#2a2a2a]"
-          }`}
-        >
-          English
-        </button>
-        <button
-          type="button"
-          onClick={() => setLang("ja")}
-          className={`px-4 py-2 text-sm font-semibold rounded-sm transition-colors ${
-            lang === "ja" ? "bg-[#c9a84c] text-black" : "bg-[#1c1c1c] text-gray-400 hover:bg-[#2a2a2a]"
-          }`}
-        >
-          Japanese
-        </button>
+      <div className="flex items-center justify-between border-b border-gray-800 mb-6">
+        <div className="flex">
+          <button
+            type="button"
+            onClick={() => setLang("en")}
+            className={`px-6 py-3 font-semibold tracking-widest text-sm transition-colors ${
+              lang === "en" ? "border-b-2 border-[#c9a84c] text-white" : "text-gray-500 hover:text-gray-300"
+            }`}
+          >
+            ENGLISH
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang("ja")}
+            className={`px-6 py-3 font-semibold tracking-widest text-sm transition-colors ${
+              lang === "ja" ? "border-b-2 border-[#c9a84c] text-white" : "text-gray-500 hover:text-gray-300"
+            }`}
+          >
+            JAPANESE (日本語)
+          </button>
+        </div>
+        
+        {lang === "en" && (
+          <button
+            type="button"
+            onClick={handleTranslateAllToJa}
+            disabled={isTranslatingAll || (!title_en && !overview_en)}
+            className="bg-purple-600 text-white px-4 py-2 text-sm font-semibold rounded-sm transition-colors hover:bg-purple-700 disabled:bg-gray-600 mb-2"
+          >
+            {isTranslatingAll ? "Translating..." : "Auto-Translate to Japanese"}
+          </button>
+        )}
+        {lang === "ja" && (
+          <button
+            type="button"
+            onClick={handleTranslateAllToEn}
+            disabled={isTranslatingAll || (!title_ja && !overview_ja)}
+            className="bg-purple-600 text-white px-4 py-2 text-sm font-semibold rounded-sm transition-colors hover:bg-purple-700 disabled:bg-gray-600 mb-2"
+          >
+            {isTranslatingAll ? "Translating..." : "Auto-Translate to English"}
+          </button>
+        )}
       </div>
 
       <form action={action} className="space-y-6">
@@ -125,15 +143,31 @@ export default function EditPortfolioForm({ item, action }: { item: any; action:
 
         {lang === "ja" && (
           <div className="space-y-6">
-            <Field
-              label="Project Title (JA)"
-              name="title_ja_display"
-              placeholder="例：eコマースプラットフォーム"
-              value={title_ja}
-              onChange={(e) => setTitleJa(e.target.value)}
-            />
+            <div className="flex items-end gap-4">
+              <Field
+                label="Project Title (JA)"
+                name="title_ja_display"
+                placeholder="例：eコマースプラットフォーム"
+                value={title_ja}
+                onChange={(e) => setTitleJa(e.target.value)}
+              />
+              <TranslateButton
+                text={title_ja}
+                sourceLanguage="Japanese"
+                targetLanguage="English"
+                onTranslated={setTitleEn}
+              />
+            </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-400 tracking-widest uppercase mb-3">Overview (JA)</label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-xs font-semibold text-gray-400 tracking-widest uppercase">Overview (JA)</label>
+                <TranslateButton
+                  text={overview_ja}
+                  sourceLanguage="Japanese"
+                  targetLanguage="English"
+                  onTranslated={setOverviewEn}
+                />
+              </div>
               <RichTextEditor
                 name="overview_ja_display"
                 placeholder="プロジェクトの詳細を説明してください..."

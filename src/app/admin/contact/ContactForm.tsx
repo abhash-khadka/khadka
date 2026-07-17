@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { ContactContent } from "@/lib/data";
-import { updateContactContent } from "@/lib/actions";
+import { updateContactContent, translateText } from "@/lib/actions";
 import TranslateButton from "@/components/TranslateButton";
 import SaveAlert from "@/components/SaveAlert";
 import FieldWithButton from "@/app/admin/landing/FieldWithButton";
@@ -47,7 +47,47 @@ export default function ContactForm({ data }: { data: ContactContent }) {
   const [sent_ja, setSentJa] = useState("");
   const [sentSubtitle_ja, setSentSubtitleJa] = useState("");
   const [sendAnother_ja, setSendAnotherJa] = useState("");
+  const [isTranslatingAll, setIsTranslatingAll] = useState(false);
 
+  const handleTranslateAllToJa = async () => {
+    setIsTranslatingAll(true);
+    try {
+      if (tag_en && !tag_ja) setTagJa(await translateText(tag_en, "English", "Japanese"));
+      if (title_en && !title_ja) setTitleJa(await translateText(title_en, "English", "Japanese"));
+      if (subtitle_en && !subtitle_ja) setSubtitleJa(await translateText(subtitle_en, "English", "Japanese"));
+      if (name_en && !name_ja) setNameJa(await translateText(name_en, "English", "Japanese"));
+      if (emailPlaceholder_en && !emailPlaceholder_ja) setEmailPlaceholderJa(await translateText(emailPlaceholder_en, "English", "Japanese"));
+      if (subject_en && !subject_ja) setSubjectJa(await translateText(subject_en, "English", "Japanese"));
+      if (message_en && !message_ja) setMessageJa(await translateText(message_en, "English", "Japanese"));
+      if (send_en && !send_ja) setSendJa(await translateText(send_en, "English", "Japanese"));
+      if (sent_en && !sent_ja) setSentJa(await translateText(sent_en, "English", "Japanese"));
+      if (sentSubtitle_en && !sentSubtitle_ja) setSentSubtitleJa(await translateText(sentSubtitle_en, "English", "Japanese"));
+      if (sendAnother_en && !sendAnother_ja) setSendAnotherJa(await translateText(sendAnother_en, "English", "Japanese"));
+      setTab("ja");
+    } finally {
+      setIsTranslatingAll(false);
+    }
+  };
+
+  const handleTranslateAllToEn = async () => {
+    setIsTranslatingAll(true);
+    try {
+      if (tag_ja && !tag_en) setTagEn(await translateText(tag_ja, "Japanese", "English"));
+      if (title_ja && !title_en) setTitleEn(await translateText(title_ja, "Japanese", "English"));
+      if (subtitle_ja && !subtitle_en) setSubtitleEn(await translateText(subtitle_ja, "Japanese", "English"));
+      if (name_ja && !name_en) setNameEn(await translateText(name_ja, "Japanese", "English"));
+      if (emailPlaceholder_ja && !emailPlaceholder_en) setEmailPlaceholderEn(await translateText(emailPlaceholder_ja, "Japanese", "English"));
+      if (subject_ja && !subject_en) setSubjectEn(await translateText(subject_ja, "Japanese", "English"));
+      if (message_ja && !message_en) setMessageEn(await translateText(message_ja, "Japanese", "English"));
+      if (send_ja && !send_en) setSendEn(await translateText(send_ja, "Japanese", "English"));
+      if (sent_ja && !sent_en) setSentEn(await translateText(sent_ja, "Japanese", "English"));
+      if (sentSubtitle_ja && !sentSubtitle_en) setSentSubtitleEn(await translateText(sentSubtitle_ja, "Japanese", "English"));
+      if (sendAnother_ja && !sendAnother_en) setSendAnotherEn(await translateText(sendAnother_ja, "Japanese", "English"));
+      setTab("en");
+    } finally {
+      setIsTranslatingAll(false);
+    }
+  };
   useEffect(() => {
     if (data) {
       setLocation(data.location ?? "");
@@ -163,13 +203,49 @@ export default function ContactForm({ data }: { data: ContactContent }) {
           </div>
         </section>
 
-        <div className="bg-[#0a0a0a] border border-gray-800 rounded-sm p-2 flex gap-2">
-          <button type="button" onClick={() => setTab("en")} className={`flex-1 py-3 text-sm font-semibold tracking-widest uppercase rounded-sm transition-colors ${tab === "en" ? "bg-[#c9a84c] text-black" : "text-gray-400 hover:text-white"}`}>
-            English
-          </button>
-          <button type="button" onClick={() => setTab("ja")} className={`flex-1 py-3 text-sm font-semibold tracking-widest uppercase rounded-sm transition-colors ${tab === "ja" ? "bg-[#c9a84c] text-black" : "text-gray-400 hover:text-white"}`}>
-            Japanese
-          </button>
+        {/* Language Tabs */}
+        <div className="flex items-center justify-between border-b border-gray-800 mb-6">
+          <div className="flex">
+            <button
+              type="button"
+              onClick={() => setTab("en")}
+              className={`px-6 py-3 font-semibold tracking-widest text-sm transition-colors ${
+                tab === "en" ? "border-b-2 border-[#c9a84c] text-white" : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              ENGLISH
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("ja")}
+              className={`px-6 py-3 font-semibold tracking-widest text-sm transition-colors ${
+                tab === "ja" ? "border-b-2 border-[#c9a84c] text-white" : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              JAPANESE (日本語)
+            </button>
+          </div>
+          
+          {tab === "en" && (
+            <button
+              type="button"
+              onClick={handleTranslateAllToJa}
+              disabled={isTranslatingAll}
+              className="bg-purple-600 text-white px-4 py-2 text-sm font-semibold rounded-sm transition-colors hover:bg-purple-700 disabled:bg-gray-600 mb-2"
+            >
+              {isTranslatingAll ? "Translating..." : "Auto-Translate to Japanese"}
+            </button>
+          )}
+          {tab === "ja" && (
+            <button
+              type="button"
+              onClick={handleTranslateAllToEn}
+              disabled={isTranslatingAll}
+              className="bg-purple-600 text-white px-4 py-2 text-sm font-semibold rounded-sm transition-colors hover:bg-purple-700 disabled:bg-gray-600 mb-2"
+            >
+              {isTranslatingAll ? "Translating..." : "Auto-Translate to English"}
+            </button>
+          )}
         </div>
 
         {/* Hidden inputs to pass data back on submit since they might not be visible in DOM */}
