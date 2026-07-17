@@ -14,6 +14,20 @@
   --foreground: #ffffff;
 }
 
+html.light {
+  --bg-primary: #FAFAF9 !important;
+  --bg-secondary: #F5F5F4 !important;
+  --bg-card: #FFFFFF !important;
+  --bg-nav: #FFFFFF !important;
+  --bg-footer: #F8F8F8 !important;
+  --color-accent: #D9A05B !important;
+  --text-primary: #111827 !important;
+  --text-secondary: #6B7280 !important;
+  --border-color: #E5E7EB !important;
+  --background: #FAFAF9 !important;
+  --foreground: #111827 !important;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

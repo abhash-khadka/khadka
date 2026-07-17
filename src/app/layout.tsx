@@ -97,6 +97,17 @@ export default async function RootLayout({
         <style dangerouslySetInnerHTML={{ __html: cssVars }} />
       </head>
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.getItem('theme') === 'light') {
+                  document.documentElement.classList.add('light');
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
         <PublicLayout>{children}</PublicLayout>
       </body>
     </html>

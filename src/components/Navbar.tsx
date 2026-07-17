@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import LanguageToggle from "@/components/LanguageToggle";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Navbar() {
@@ -81,10 +82,14 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
-              <LanguageToggle />
+              <div className="flex items-center gap-4">
+                <ThemeToggle />
+                <LanguageToggle />
+              </div>
             </div>
             
             <div className="md:hidden flex items-center gap-3 z-50">
+              <ThemeToggle />
               <LanguageToggle />
               <button 
                 onClick={toggleMenu} 
