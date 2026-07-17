@@ -7,14 +7,14 @@ export default async function AdminPortfolioPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-10">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Portfolio</h1>
           <p className="text-gray-500 text-sm">{data.portfolio.length} projects total</p>
         </div>
         <Link
           href="/admin/portfolio/new"
-          className="bg-[#c9a84c] text-black font-bold px-5 py-2.5 text-sm tracking-widest uppercase hover:bg-[#b8973b] transition-colors rounded-sm"
+          className="bg-[#c9a84c] text-black font-bold px-5 py-2.5 text-sm tracking-widest uppercase hover:bg-[#b8973b] transition-colors rounded-sm w-full sm:w-auto text-center"
         >
           + New Project
         </Link>

@@ -97,7 +97,7 @@ export default async function AdminDashboard() {
       {/* Recent Blog Posts */}
       <div>
         <h2 className="text-lg font-semibold text-white mb-4">Recent Blog Posts</h2>
-        <div className="bg-[#111111] border border-gray-800 rounded-sm overflow-hidden">
+        <div className="bg-[#111111] border border-gray-800 rounded-sm overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-800">

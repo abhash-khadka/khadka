@@ -98,17 +98,17 @@ export default async function AdminThemePage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-4 pt-4 border-t border-gray-800">
+        <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-800">
           <button
             type="submit"
-            className="bg-[#c9a84c] text-black font-bold px-8 py-3 text-sm tracking-widest uppercase hover:bg-[#b8973b] transition-colors rounded-sm"
+            className="bg-[#c9a84c] text-black font-bold px-8 py-3 text-sm tracking-widest uppercase hover:bg-[#b8973b] transition-colors rounded-sm w-full sm:w-auto"
           >
             Save Theme
           </button>
           <a
             href="/"
             target="_blank"
-            className="border border-gray-700 text-gray-400 font-medium px-8 py-3 text-sm hover:border-gray-500 hover:text-white transition-colors rounded-sm flex items-center justify-center"
+            className="border border-gray-700 text-gray-400 font-medium px-8 py-3 text-sm hover:border-gray-500 hover:text-white transition-colors rounded-sm flex items-center justify-center w-full sm:w-auto"
           >
             Preview Site ↗
           </a>
