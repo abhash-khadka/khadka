@@ -16,19 +16,19 @@ export default function Portfolio({ projects }: { projects: PortfolioItem[] }) {
     : projects.filter(project => project.category.toLowerCase() === filter);
 
   return (
-    <section id="portfolio" className="py-24 px-6" style={{ background: "var(--bg-primary)" }}>
+    <section id="portfolio" className="py-16 sm:py-20 md:py-24 lg:py-32 px-3 sm:px-6 lg:px-8" style={{ background: "var(--bg-primary)" }}>
       <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-16">
-          <p className="font-semibold tracking-widest text-xs uppercase mb-3" style={{ color: "var(--color-accent)" }}>
+        <div className="text-center mb-10 sm:mb-14 md:mb-16">
+          <p className="font-medium tracking-[3px] sm:tracking-[4px] text-[10px] sm:text-xs uppercase mb-3 sm:mb-4" style={{ color: "var(--color-accent)" }}>
             {t.portfolio.tag}
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
             {t.portfolio.title}
           </h2>
         </div>
 
         {/* Categories */}
-        <div className="flex flex-wrap justify-center gap-6 md:gap-10 mb-12 text-sm font-medium">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 mb-10 sm:mb-12 md:mb-14 text-xs sm:text-sm tracking-wide">
           {categories.map((category) => (
             <button 
               key={category.key}

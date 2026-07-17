@@ -8,13 +8,13 @@ export default function Blog({ posts }: { posts: BlogPost[] }) {
   const { lang, t } = useLanguage();
 
   return (
-    <section id="blogs" className="py-24 px-6" style={{ background: "var(--bg-secondary)" }}>
-      <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-16">
-          <p className="font-semibold tracking-widest text-xs uppercase mb-3" style={{ color: "var(--color-accent)" }}>
+    <section id="blogs" className="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 lg:px-8" style={{ background: "var(--bg-secondary)" }}>
+      <div className="container mx-auto max-w-7xl">
+        <div className="text-center mb-10 sm:mb-14 md:mb-16">
+          <p className="font-medium tracking-[3px] sm:tracking-[4px] text-[10px] sm:text-xs uppercase mb-3 sm:mb-4" style={{ color: "var(--color-accent)" }}>
             {t.blog.tag}
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
             {t.blog.title}
           </h2>
         </div>

@@ -134,30 +134,30 @@ export default function LandingForm({ data }: { data: SiteData["landing"] }) {
 
   return (
     <form action={updateLandingContent} className="space-y-10">
-      <input type="hidden" name="tagline_en" value={tagline_en} />
-      <input type="hidden" name="title_en" value={title_en} />
-      <input type="hidden" name="subtitle_en" value={subtitle_en} />
-      <input type="hidden" name="ctaText_en" value={ctaText_en} />
-      <input type="hidden" name="aboutTag_en" value={aboutTag_en} />
-      <input type="hidden" name="aboutTitle_en" value={aboutTitle_en} />
-      <input type="hidden" name="bio1_en" value={bio1_en} />
-      <input type="hidden" name="bio2_en" value={bio2_en} />
-      <input type="hidden" name="bio3_en" value={bio3_en} />
-      <input type="hidden" name="gpa_en" value={gpa_en} />
-      <input type="hidden" name="projectsCount_en" value={projectsCount_en} />
-      <input type="hidden" name="certs_en" value={certs_en} />
-      <input type="hidden" name="tagline_ja" value={tagline_ja} />
-      <input type="hidden" name="title_ja" value={title_ja} />
-      <input type="hidden" name="subtitle_ja" value={subtitle_ja} />
-      <input type="hidden" name="ctaText_ja" value={ctaText_ja} />
-      <input type="hidden" name="aboutTag_ja" value={aboutTag_ja} />
-      <input type="hidden" name="aboutTitle_ja" value={aboutTitle_ja} />
-      <input type="hidden" name="bio1_ja" value={bio1_ja} />
-      <input type="hidden" name="bio2_ja" value={bio2_ja} />
-      <input type="hidden" name="bio3_ja" value={bio3_ja} />
-      <input type="hidden" name="gpa_ja" value={gpa_ja} />
-      <input type="hidden" name="projectsCount_ja" value={projectsCount_ja} />
-      <input type="hidden" name="certs_ja" value={certs_ja} />
+      <input type="hidden" name="tagline_en" value={tagline_en || ""} />
+      <input type="hidden" name="title_en" value={title_en || ""} />
+      <input type="hidden" name="subtitle_en" value={subtitle_en || ""} />
+      <input type="hidden" name="ctaText_en" value={ctaText_en || ""} />
+      <input type="hidden" name="aboutTag_en" value={aboutTag_en || ""} />
+      <input type="hidden" name="aboutTitle_en" value={aboutTitle_en || ""} />
+      <input type="hidden" name="bio1_en" value={bio1_en || ""} />
+      <input type="hidden" name="bio2_en" value={bio2_en || ""} />
+      <input type="hidden" name="bio3_en" value={bio3_en || ""} />
+      <input type="hidden" name="gpa_en" value={gpa_en || ""} />
+      <input type="hidden" name="projectsCount_en" value={projectsCount_en || ""} />
+      <input type="hidden" name="certs_en" value={certs_en || ""} />
+      <input type="hidden" name="tagline_ja" value={tagline_ja || ""} />
+      <input type="hidden" name="title_ja" value={title_ja || ""} />
+      <input type="hidden" name="subtitle_ja" value={subtitle_ja || ""} />
+      <input type="hidden" name="ctaText_ja" value={ctaText_ja || ""} />
+      <input type="hidden" name="aboutTag_ja" value={aboutTag_ja || ""} />
+      <input type="hidden" name="aboutTitle_ja" value={aboutTitle_ja || ""} />
+      <input type="hidden" name="bio1_ja" value={bio1_ja || ""} />
+      <input type="hidden" name="bio2_ja" value={bio2_ja || ""} />
+      <input type="hidden" name="bio3_ja" value={bio3_ja || ""} />
+      <input type="hidden" name="gpa_ja" value={gpa_ja || ""} />
+      <input type="hidden" name="projectsCount_ja" value={projectsCount_ja || ""} />
+      <input type="hidden" name="certs_ja" value={certs_ja || ""} />
       
       {/* Language Tabs */}
       <div className="flex border-b border-gray-800 mb-6">

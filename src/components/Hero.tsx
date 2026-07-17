@@ -21,21 +21,21 @@ export default function Hero({ data }: { data: SiteData['landing'] }) {
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-background/50 to-background" />
       
       <div className="relative z-20 text-center px-4 max-w-4xl mx-auto flex flex-col items-center">
-        <p className="font-semibold tracking-[0.2em] text-xs sm:text-sm mb-4 uppercase" style={{ color: "var(--color-accent)" }}>
+        <p className="font-medium tracking-[4px] sm:tracking-[6px] text-[10px] sm:text-xs md:text-sm mb-4 sm:mb-6 uppercase" style={{ color: "var(--color-accent)" }}>
           {hero.tagline}
         </p>
         
-        <h1 className="text-6xl sm:text-8xl md:text-9xl font-extrabold tracking-tighter mb-6 drop-shadow-lg" style={{ color: "var(--text-primary)" }}>
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9] mb-4 sm:mb-6 drop-shadow-lg" style={{ color: "var(--text-primary)" }}>
           {hero.title}
         </h1>
         
-        <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+        <p className="text-base sm:text-lg md:text-xl font-light max-w-lg sm:max-w-xl mx-auto mb-8 sm:mb-10 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
           {hero.subtitle}
         </p>
         
         <a 
           href="#portfolio"
-          className="inline-block border px-8 py-3 text-sm font-medium tracking-widest hover:opacity-80 transition-colors duration-300 uppercase"
+          className="inline-block border px-8 sm:px-10 py-3.5 sm:py-4 text-[10px] sm:text-xs font-semibold tracking-[2px] sm:tracking-[3px] hover:opacity-80 transition-all duration-500 uppercase"
           style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}
         >
           {t.hero.cta}

@@ -11,18 +11,18 @@ function ContactForm() {
   const { t } = useLanguage();
 
   return (
-    <section id="contact" className="py-24 px-6" style={{ background: "var(--bg-secondary)" }}>
-      <div className="container mx-auto max-w-6xl">
-        <div className="flex flex-col lg:flex-row gap-16">
+    <section id="contact" className="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 lg:px-8" style={{ background: "var(--bg-secondary)" }}>
+      <div className="container mx-auto max-w-7xl">
+        <div className="flex flex-col lg:flex-row gap-10 sm:gap-14 lg:gap-16">
           {/* Left side: Contact Info */}
           <div className="w-full lg:w-1/3">
-            <p className="font-semibold tracking-widest text-xs uppercase mb-3" style={{ color: "var(--color-accent)" }}>
+            <p className="font-medium tracking-[3px] sm:tracking-[4px] text-[10px] sm:text-xs uppercase mb-3 sm:mb-4" style={{ color: "var(--color-accent)" }}>
               {t.contact.tag}
             </p>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-8" style={{ color: "var(--text-primary)" }}>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-6 sm:mb-8 leading-tight" style={{ color: "var(--text-primary)" }}>
               {t.contact.title}
             </h2>
-            <p className="text-lg leading-relaxed mb-12" style={{ color: "var(--text-secondary)" }}>
+            <p className="text-sm sm:text-[15px] leading-relaxed mb-8 sm:mb-10 md:mb-12 max-w-md" style={{ color: "var(--text-secondary)" }}>
               {t.contact.subtitle}
             </p>
             
@@ -105,7 +105,7 @@ function ContactForm() {
                 />
                 <button
                   type="submit"
-                  className="font-semibold text-sm tracking-widest uppercase px-10 py-4 hover:opacity-80 transition-colors"
+                  className="w-full sm:w-auto font-semibold text-xs tracking-[2px] uppercase px-10 py-4 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
                   style={{ background: "var(--color-accent)", color: "var(--bg-primary)" }}
                 >
                   {t.contact.send}

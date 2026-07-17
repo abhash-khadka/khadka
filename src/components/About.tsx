@@ -10,14 +10,14 @@ export default function About({ data }: { data: SiteData['landing'] }) {
   const { images } = data;
 
   return (
-    <section id="about" className="py-16 md:py-24 px-6" style={{ background: "var(--bg-secondary)" }}>
-      <div className="container mx-auto max-w-6xl">
+    <section id="about" className="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 lg:px-8" style={{ background: "var(--bg-secondary)" }}>
+      <div className="container mx-auto max-w-7xl">
         {/* Title Section Moved to Top */}
-        <div className="mb-8 md:mb-16 text-center lg:text-left">
-          <p className="font-semibold tracking-widest text-[10px] md:text-xs uppercase mb-2 md:mb-3" style={{ color: "var(--color-accent)" }}>
+        <div className="mb-10 sm:mb-14 md:mb-16 text-center lg:text-left">
+          <p className="font-medium tracking-[3px] sm:tracking-[4px] text-[10px] sm:text-xs uppercase mb-3 sm:mb-4" style={{ color: "var(--color-accent)" }}>
             {about.tag}
           </p>
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-6 sm:mb-8 leading-tight" style={{ color: "var(--text-primary)" }}>
             {about.title}
           </h2>
         </div>
@@ -35,7 +35,7 @@ export default function About({ data }: { data: SiteData['landing'] }) {
           
           {/* Right side Content */}
           <div className="w-full lg:w-1/2">
-            <div className="space-y-4 md:space-y-6 text-sm md:text-lg leading-relaxed mb-8 md:mb-12" style={{ color: "var(--text-secondary)" }}>
+            <div className="space-y-4 sm:space-y-5 text-sm sm:text-[15px] leading-relaxed mb-8 md:mb-12" style={{ color: "var(--text-secondary)" }}>
               <p>{about.bio1}</p>
               <p>{about.bio2}</p>
               <p>{about.bio3}</p>
