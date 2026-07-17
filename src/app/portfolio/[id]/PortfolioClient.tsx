@@ -11,37 +11,37 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
   const overview = (project[`overview_${lang}` as keyof PortfolioItem] as string) || project.overview_en;
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a]">
+    <main className="min-h-screen bg-background text-foreground">
       <div className="flex flex-col lg:flex-row min-h-screen">
         
         {/* Left Side: Sticky Sidebar with Clean Image and Title */}
-        <div className="w-full lg:w-1/2 lg:h-screen lg:sticky lg:top-0 flex flex-col p-8 md:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-gray-800 bg-[#0a0a0a] overflow-hidden">
+        <div className="w-full lg:w-1/2 lg:h-screen lg:sticky lg:top-0 flex flex-col p-8 md:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r overflow-hidden" style={{ borderColor: "var(--border-color)", background: "var(--bg-primary)" }}>
           
           {/* Title Section */}
           <div className="mb-8">
-            <p className="text-[#c9a84c] font-semibold tracking-widest text-xs uppercase mb-3 flex items-center gap-2">
-              <span className="w-6 h-px bg-[#c9a84c] inline-block"></span>
+            <p className="font-semibold tracking-widest text-xs uppercase mb-3 flex items-center gap-2" style={{ color: "var(--color-accent)" }}>
+              <span className="w-6 h-px inline-block" style={{ background: "var(--color-accent)" }}></span>
               {project.category}
             </p>
-            <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-snug">
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight leading-snug" style={{ color: "var(--text-primary)" }}>
               {title}
             </h1>
           </div>
 
           {/* Clean Image Section (Frameless) */}
-          <div className="w-full flex-1 min-h-[300px] lg:min-h-[400px] overflow-hidden relative mb-8">
+          <div className="w-full flex-1 min-h-[300px] lg:min-h-[400px] overflow-hidden relative mb-8 rounded-sm" style={{ background: "var(--bg-secondary)" }}>
             {project.image ? (
               <ImageModal src={project.image} alt={title} />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="text-gray-800 text-3xl font-bold opacity-30">No Image</span>
+                <span className="text-3xl font-bold opacity-30" style={{ color: "var(--text-secondary)" }}>No Image</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Right Side: Scrollable Content */}
-        <div className="w-full lg:w-1/2 p-8 md:p-12 lg:p-16 xl:p-24 bg-[#0a0a0a]">
+        <div className="w-full lg:w-1/2 p-8 md:p-12 lg:p-16 xl:p-24" style={{ background: "var(--bg-primary)" }}>
           
           {/* Action Links */}
           {(project.liveUrl || project.githubUrl) && (
@@ -51,7 +51,8 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
                   href={project.liveUrl} 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="flex items-center justify-center gap-2 w-full sm:w-auto bg-white text-black px-8 py-3.5 rounded-full text-sm font-bold hover:bg-gray-200 transition-colors shadow-lg shadow-white/5"
+                  className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-bold transition-colors shadow-lg"
+                  style={{ background: "var(--text-primary)", color: "var(--bg-primary)" }}
                 >
                   Visit Live Site
                   <span className="text-lg leading-none">↗</span>
@@ -62,7 +63,8 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
                   href={project.githubUrl} 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="flex items-center justify-center gap-2 w-full sm:w-auto bg-[#111] border border-gray-800 text-white px-8 py-3.5 rounded-full text-sm font-bold hover:border-gray-600 hover:bg-white/5 transition-colors"
+                  className="flex items-center justify-center gap-2 w-full sm:w-auto border px-8 py-3.5 rounded-full text-sm font-bold transition-colors"
+                  style={{ background: "transparent", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
                 >
                   View Source Code
                   <span className="text-lg leading-none">↗</span>
@@ -73,27 +75,36 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
 
           {/* Rich Text Overview */}
           <div className="mb-16">
-            <h2 className="text-sm font-semibold tracking-widest uppercase text-gray-500 mb-6 flex items-center gap-3">
-              <span className="w-2 h-2 rounded-full bg-[#c9a84c]"></span>
+            <h2 className="text-sm font-semibold tracking-widest uppercase mb-6 flex items-center gap-3" style={{ color: "var(--text-secondary)" }}>
+              <span className="w-2 h-2 rounded-full" style={{ background: "var(--color-accent)" }}></span>
               Project Overview
             </h2>
             <div
-              className="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed prose-headings:text-white prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-a:text-[#c9a84c] prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-img:rounded-xl prose-img:border prose-img:border-gray-800"
+              className="prose prose-lg max-w-none leading-relaxed"
+              style={{
+                color: "var(--text-secondary)",
+                "--tw-prose-body": "var(--text-secondary)",
+                "--tw-prose-headings": "var(--text-primary)",
+                "--tw-prose-links": "var(--color-accent)",
+                "--tw-prose-bold": "var(--text-primary)",
+                "--tw-prose-quotes": "var(--text-secondary)",
+              } as React.CSSProperties}
               dangerouslySetInnerHTML={{ __html: overview || "" }}
             />
           </div>
 
           {/* Tech Stack */}
           <div className="mb-16">
-            <h2 className="text-sm font-semibold tracking-widest uppercase text-gray-500 mb-6 flex items-center gap-3">
-              <span className="w-2 h-2 rounded-full bg-[#c9a84c]"></span>
+            <h2 className="text-sm font-semibold tracking-widest uppercase mb-6 flex items-center gap-3" style={{ color: "var(--text-secondary)" }}>
+              <span className="w-2 h-2 rounded-full" style={{ background: "var(--color-accent)" }}></span>
               Technologies Used
             </h2>
             <div className="flex flex-wrap gap-3">
               {project.technologies.map((tech) => (
                 <span 
                   key={tech} 
-                  className="bg-[#111] border border-gray-800 text-gray-300 px-4 py-2 text-sm font-medium rounded-lg shadow-sm"
+                  className="border px-4 py-2 text-sm font-medium rounded-lg shadow-sm"
+                  style={{ background: "var(--bg-secondary)", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
                 >
                   {tech}
                 </span>
@@ -102,15 +113,15 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
           </div>
 
           {/* Call to action */}
-          <div className="bg-gradient-to-br from-[#111] to-[#0a0a0a] border border-gray-800/80 rounded-2xl p-8 shadow-xl relative overflow-hidden mt-12">
-            <div className="absolute top-0 right-0 p-6 opacity-5 transform rotate-12 scale-150">
+          <div className="border rounded-2xl p-8 shadow-xl relative overflow-hidden mt-12" style={{ background: "var(--bg-secondary)", borderColor: "var(--border-color)" }}>
+            <div className="absolute top-0 right-0 p-6 opacity-5 transform rotate-12 scale-150" style={{ color: "var(--text-primary)" }}>
               <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2z"/></svg>
             </div>
-            <h3 className="text-white font-bold mb-3 text-xl relative z-10">Want a similar project?</h3>
-            <p className="text-gray-400 text-sm mb-8 leading-relaxed max-w-sm relative z-10">
+            <h3 className="font-bold mb-3 text-xl relative z-10" style={{ color: "var(--text-primary)" }}>Want a similar project?</h3>
+            <p className="text-sm mb-8 leading-relaxed max-w-sm relative z-10" style={{ color: "var(--text-secondary)" }}>
               I'm currently available for freelance work and would love to help you build your next big idea.
             </p>
-            <Link href="/contact" className="relative z-10 inline-flex items-center gap-3 text-[#0a0a0a] bg-[#c9a84c] hover:bg-[#d6b75e] px-6 py-2.5 rounded-full text-sm font-bold tracking-widest uppercase transition-colors shadow-lg shadow-[#c9a84c]/20">
+            <Link href="/contact" className="relative z-10 inline-flex items-center gap-3 px-6 py-2.5 rounded-full text-sm font-bold tracking-widest uppercase transition-colors shadow-lg" style={{ background: "var(--color-accent)", color: "var(--bg-primary)" }}>
               Let's Talk
               <span className="text-lg leading-none">→</span>
             </Link>
