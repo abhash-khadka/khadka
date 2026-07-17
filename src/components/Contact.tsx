@@ -14,6 +14,16 @@ function ContactForm({ data }: { data?: ContactContent }) {
   const tag = data ? (lang === "ja" ? data.tag_ja : data.tag_en) : t.contact.tag;
   const title = data ? (lang === "ja" ? data.title_ja : data.title_en) : t.contact.title;
   const subtitle = data ? (lang === "ja" ? data.subtitle_ja : data.subtitle_en) : t.contact.subtitle;
+  
+  const nameLabel = data ? (lang === "ja" ? data.name_ja : data.name_en) : t.contact.name;
+  const emailPlaceholderLabel = data ? (lang === "ja" ? data.emailPlaceholder_ja : data.emailPlaceholder_en) : t.contact.emailPlaceholder;
+  const subjectLabel = data ? (lang === "ja" ? data.subject_ja : data.subject_en) : t.contact.subject;
+  const messageLabel = data ? (lang === "ja" ? data.message_ja : data.message_en) : t.contact.message;
+  const sendLabel = data ? (lang === "ja" ? data.send_ja : data.send_en) : t.contact.send;
+  const sentLabel = data ? (lang === "ja" ? data.sent_ja : data.sent_en) : t.contact.sent;
+  const sentSubtitleLabel = data ? (lang === "ja" ? data.sentSubtitle_ja : data.sentSubtitle_en) : t.contact.sentSubtitle;
+  const sendAnotherLabel = data ? (lang === "ja" ? data.sendAnother_ja : data.sendAnother_en) : t.contact.sendAnother;
+
   const location = data?.location || "Hiroshima, Japan";
   const email = data?.email || "info.abhashk@gmail.com";
 
@@ -68,10 +78,10 @@ function ContactForm({ data }: { data?: ContactContent }) {
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6" style={{ background: "color-mix(in srgb, var(--color-accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)" }}>
                   <span className="text-3xl" style={{ color: "var(--color-accent)" }}>✓</span>
                 </div>
-                <h3 className="text-2xl font-bold mb-3" style={{ color: "var(--text-primary)" }}>{t.contact.sent}</h3>
-                <p className="mb-8" style={{ color: "var(--text-secondary)" }}>{t.contact.sentSubtitle}</p>
+                <h3 className="text-2xl font-bold mb-3" style={{ color: "var(--text-primary)" }}>{sentLabel}</h3>
+                <p className="mb-8" style={{ color: "var(--text-secondary)" }}>{sentSubtitleLabel}</p>
                 <a href="/contact" className="text-sm font-medium hover:opacity-70 transition-colors" style={{ color: "var(--color-accent)" }}>
-                  {t.contact.sendAnother}
+                  {sendAnotherLabel}
                 </a>
               </div>
             ) : (
@@ -81,7 +91,7 @@ function ContactForm({ data }: { data?: ContactContent }) {
                     type="text"
                     name="name"
                     required
-                    placeholder={t.contact.name}
+                    placeholder={nameLabel}
                     className="w-full bg-transparent p-4 focus:outline-none transition-colors"
                     style={{ border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
                   />
@@ -89,7 +99,7 @@ function ContactForm({ data }: { data?: ContactContent }) {
                     type="email"
                     name="email"
                     required
-                    placeholder={t.contact.emailPlaceholder}
+                    placeholder={emailPlaceholderLabel}
                     className="w-full bg-transparent p-4 focus:outline-none transition-colors"
                     style={{ border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
                   />
@@ -98,14 +108,14 @@ function ContactForm({ data }: { data?: ContactContent }) {
                   type="text"
                   name="subject"
                   required
-                  placeholder={t.contact.subject}
+                  placeholder={subjectLabel}
                   className="w-full bg-transparent p-4 focus:outline-none transition-colors"
                   style={{ border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
                 />
                 <textarea
                   name="message"
                   required
-                  placeholder={t.contact.message}
+                  placeholder={messageLabel}
                   rows={6}
                   className="w-full bg-transparent p-4 focus:outline-none transition-colors resize-none"
                   style={{ border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
@@ -115,7 +125,7 @@ function ContactForm({ data }: { data?: ContactContent }) {
                   className="w-full sm:w-auto font-semibold text-xs tracking-[2px] uppercase px-10 py-4 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
                   style={{ background: "var(--color-accent)", color: "var(--bg-primary)" }}
                 >
-                  {t.contact.send}
+                  {sendLabel}
                 </button>
               </form>
             )}

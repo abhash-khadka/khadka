@@ -21,12 +21,32 @@ export default function ContactForm({ data }: { data: ContactContent }) {
 
   const [location, setLocation] = useState("");
   const [email, setEmail] = useState("");
+  
+  // English Fields
   const [tag_en, setTagEn] = useState("");
   const [title_en, setTitleEn] = useState("");
   const [subtitle_en, setSubtitleEn] = useState("");
+  const [name_en, setNameEn] = useState("");
+  const [emailPlaceholder_en, setEmailPlaceholderEn] = useState("");
+  const [subject_en, setSubjectEn] = useState("");
+  const [message_en, setMessageEn] = useState("");
+  const [send_en, setSendEn] = useState("");
+  const [sent_en, setSentEn] = useState("");
+  const [sentSubtitle_en, setSentSubtitleEn] = useState("");
+  const [sendAnother_en, setSendAnotherEn] = useState("");
+
+  // Japanese Fields
   const [tag_ja, setTagJa] = useState("");
   const [title_ja, setTitleJa] = useState("");
   const [subtitle_ja, setSubtitleJa] = useState("");
+  const [name_ja, setNameJa] = useState("");
+  const [emailPlaceholder_ja, setEmailPlaceholderJa] = useState("");
+  const [subject_ja, setSubjectJa] = useState("");
+  const [message_ja, setMessageJa] = useState("");
+  const [send_ja, setSendJa] = useState("");
+  const [sent_ja, setSentJa] = useState("");
+  const [sentSubtitle_ja, setSentSubtitleJa] = useState("");
+  const [sendAnother_ja, setSendAnotherJa] = useState("");
 
   useEffect(() => {
     if (data) {
@@ -35,9 +55,26 @@ export default function ContactForm({ data }: { data: ContactContent }) {
       setTagEn(data.tag_en ?? "");
       setTitleEn(data.title_en ?? "");
       setSubtitleEn(data.subtitle_en ?? "");
+      setNameEn(data.name_en ?? "");
+      setEmailPlaceholderEn(data.emailPlaceholder_en ?? "");
+      setSubjectEn(data.subject_en ?? "");
+      setMessageEn(data.message_en ?? "");
+      setSendEn(data.send_en ?? "");
+      setSentEn(data.sent_en ?? "");
+      setSentSubtitleEn(data.sentSubtitle_en ?? "");
+      setSendAnotherEn(data.sendAnother_en ?? "");
+      
       setTagJa(data.tag_ja ?? "");
       setTitleJa(data.title_ja ?? "");
       setSubtitleJa(data.subtitle_ja ?? "");
+      setNameJa(data.name_ja ?? "");
+      setEmailPlaceholderJa(data.emailPlaceholder_ja ?? "");
+      setSubjectJa(data.subject_ja ?? "");
+      setMessageJa(data.message_ja ?? "");
+      setSendJa(data.send_ja ?? "");
+      setSentJa(data.sent_ja ?? "");
+      setSentSubtitleJa(data.sentSubtitle_ja ?? "");
+      setSendAnotherJa(data.sendAnother_ja ?? "");
     }
   }, [data]);
 
@@ -53,6 +90,18 @@ export default function ContactForm({ data }: { data: ContactContent }) {
             <FieldWithButton label="Tag" name="tag_en_display" value={tag_en} onChange={(e) => setTagEn(e.target.value)} onTranslate={setTagJa} sourceLang="English" targetLang="Japanese" />
             <FieldWithButton label="Title" name="title_en_display" value={title_en} onChange={(e) => setTitleEn(e.target.value)} onTranslate={setTitleJa} sourceLang="English" targetLang="Japanese" />
             <FieldWithButton label="Subtitle" name="subtitle_en_display" value={subtitle_en} onChange={(e) => setSubtitleEn(e.target.value)} onTranslate={setSubtitleJa} sourceLang="English" targetLang="Japanese" textarea />
+            
+            <h3 className="text-white font-bold text-md pt-4 border-t border-gray-800">Form Fields</h3>
+            <FieldWithButton label="Name Placeholder" name="name_en_display" value={name_en} onChange={(e) => setNameEn(e.target.value)} onTranslate={setNameJa} sourceLang="English" targetLang="Japanese" />
+            <FieldWithButton label="Email Placeholder" name="emailPlaceholder_en_display" value={emailPlaceholder_en} onChange={(e) => setEmailPlaceholderEn(e.target.value)} onTranslate={setEmailPlaceholderJa} sourceLang="English" targetLang="Japanese" />
+            <FieldWithButton label="Subject Placeholder" name="subject_en_display" value={subject_en} onChange={(e) => setSubjectEn(e.target.value)} onTranslate={setSubjectJa} sourceLang="English" targetLang="Japanese" />
+            <FieldWithButton label="Message Placeholder" name="message_en_display" value={message_en} onChange={(e) => setMessageEn(e.target.value)} onTranslate={setMessageJa} sourceLang="English" targetLang="Japanese" />
+            <FieldWithButton label="Send Button" name="send_en_display" value={send_en} onChange={(e) => setSendEn(e.target.value)} onTranslate={setSendJa} sourceLang="English" targetLang="Japanese" />
+            
+            <h3 className="text-white font-bold text-md pt-4 border-t border-gray-800">Success Message</h3>
+            <FieldWithButton label="Sent Title" name="sent_en_display" value={sent_en} onChange={(e) => setSentEn(e.target.value)} onTranslate={setSentJa} sourceLang="English" targetLang="Japanese" />
+            <FieldWithButton label="Sent Subtitle" name="sentSubtitle_en_display" value={sentSubtitle_en} onChange={(e) => setSentSubtitleEn(e.target.value)} onTranslate={setSentSubtitleJa} sourceLang="English" targetLang="Japanese" />
+            <FieldWithButton label="Send Another Button" name="sendAnother_en_display" value={sendAnother_en} onChange={(e) => setSendAnotherEn(e.target.value)} onTranslate={setSendAnotherJa} sourceLang="English" targetLang="Japanese" />
           </section>
         </div>
       );
@@ -66,6 +115,18 @@ export default function ContactForm({ data }: { data: ContactContent }) {
             <FieldWithButton label="Tag" name="tag_ja_display" value={tag_ja} onChange={(e) => setTagJa(e.target.value)} onTranslate={setTagEn} sourceLang="Japanese" targetLang="English" />
             <FieldWithButton label="Title" name="title_ja_display" value={title_ja} onChange={(e) => setTitleJa(e.target.value)} onTranslate={setTitleEn} sourceLang="Japanese" targetLang="English" />
             <FieldWithButton label="Subtitle" name="subtitle_ja_display" value={subtitle_ja} onChange={(e) => setSubtitleJa(e.target.value)} onTranslate={setSubtitleEn} sourceLang="Japanese" targetLang="English" textarea />
+            
+            <h3 className="text-white font-bold text-md pt-4 border-t border-gray-800">Form Fields</h3>
+            <FieldWithButton label="Name Placeholder" name="name_ja_display" value={name_ja} onChange={(e) => setNameJa(e.target.value)} onTranslate={setNameEn} sourceLang="Japanese" targetLang="English" />
+            <FieldWithButton label="Email Placeholder" name="emailPlaceholder_ja_display" value={emailPlaceholder_ja} onChange={(e) => setEmailPlaceholderJa(e.target.value)} onTranslate={setEmailPlaceholderEn} sourceLang="Japanese" targetLang="English" />
+            <FieldWithButton label="Subject Placeholder" name="subject_ja_display" value={subject_ja} onChange={(e) => setSubjectJa(e.target.value)} onTranslate={setSubjectEn} sourceLang="Japanese" targetLang="English" />
+            <FieldWithButton label="Message Placeholder" name="message_ja_display" value={message_ja} onChange={(e) => setMessageJa(e.target.value)} onTranslate={setMessageEn} sourceLang="Japanese" targetLang="English" />
+            <FieldWithButton label="Send Button" name="send_ja_display" value={send_ja} onChange={(e) => setSendJa(e.target.value)} onTranslate={setSendEn} sourceLang="Japanese" targetLang="English" />
+            
+            <h3 className="text-white font-bold text-md pt-4 border-t border-gray-800">Success Message</h3>
+            <FieldWithButton label="Sent Title" name="sent_ja_display" value={sent_ja} onChange={(e) => setSentJa(e.target.value)} onTranslate={setSentEn} sourceLang="Japanese" targetLang="English" />
+            <FieldWithButton label="Sent Subtitle" name="sentSubtitle_ja_display" value={sentSubtitle_ja} onChange={(e) => setSentSubtitleJa(e.target.value)} onTranslate={setSentSubtitleEn} sourceLang="Japanese" targetLang="English" />
+            <FieldWithButton label="Send Another Button" name="sendAnother_ja_display" value={sendAnother_ja} onChange={(e) => setSendAnotherJa(e.target.value)} onTranslate={setSendAnotherEn} sourceLang="Japanese" targetLang="English" />
           </section>
         </div>
       );
@@ -115,9 +176,26 @@ export default function ContactForm({ data }: { data: ContactContent }) {
         <input type="hidden" name="tag_en" value={tag_en} />
         <input type="hidden" name="title_en" value={title_en} />
         <input type="hidden" name="subtitle_en" value={subtitle_en} />
+        <input type="hidden" name="name_en" value={name_en} />
+        <input type="hidden" name="emailPlaceholder_en" value={emailPlaceholder_en} />
+        <input type="hidden" name="subject_en" value={subject_en} />
+        <input type="hidden" name="message_en" value={message_en} />
+        <input type="hidden" name="send_en" value={send_en} />
+        <input type="hidden" name="sent_en" value={sent_en} />
+        <input type="hidden" name="sentSubtitle_en" value={sentSubtitle_en} />
+        <input type="hidden" name="sendAnother_en" value={sendAnother_en} />
+
         <input type="hidden" name="tag_ja" value={tag_ja} />
         <input type="hidden" name="title_ja" value={title_ja} />
         <input type="hidden" name="subtitle_ja" value={subtitle_ja} />
+        <input type="hidden" name="name_ja" value={name_ja} />
+        <input type="hidden" name="emailPlaceholder_ja" value={emailPlaceholder_ja} />
+        <input type="hidden" name="subject_ja" value={subject_ja} />
+        <input type="hidden" name="message_ja" value={message_ja} />
+        <input type="hidden" name="send_ja" value={send_ja} />
+        <input type="hidden" name="sent_ja" value={sent_ja} />
+        <input type="hidden" name="sentSubtitle_ja" value={sentSubtitle_ja} />
+        <input type="hidden" name="sendAnother_ja" value={sendAnother_ja} />
 
         {renderLanguageSection("en")}
         {renderLanguageSection("ja")}

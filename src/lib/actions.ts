@@ -362,9 +362,26 @@ export async function updateContactContent(formData: FormData) {
     tag_en:      (formData.get("tag_en")      as string) || "",
     title_en:    (formData.get("title_en")    as string) || "",
     subtitle_en: (formData.get("subtitle_en") as string) || "",
+    name_en:     (formData.get("name_en")     as string) || "",
+    emailPlaceholder_en: (formData.get("emailPlaceholder_en") as string) || "",
+    subject_en:  (formData.get("subject_en")  as string) || "",
+    message_en:  (formData.get("message_en")  as string) || "",
+    send_en:     (formData.get("send_en")     as string) || "",
+    sent_en:     (formData.get("sent_en")     as string) || "",
+    sentSubtitle_en: (formData.get("sentSubtitle_en") as string) || "",
+    sendAnother_en: (formData.get("sendAnother_en") as string) || "",
+    
     tag_ja:      (formData.get("tag_ja")      as string) || "",
     title_ja:    (formData.get("title_ja")    as string) || "",
     subtitle_ja: (formData.get("subtitle_ja") as string) || "",
+    name_ja:     (formData.get("name_ja")     as string) || "",
+    emailPlaceholder_ja: (formData.get("emailPlaceholder_ja") as string) || "",
+    subject_ja:  (formData.get("subject_ja")  as string) || "",
+    message_ja:  (formData.get("message_ja")  as string) || "",
+    send_ja:     (formData.get("send_ja")     as string) || "",
+    sent_ja:     (formData.get("sent_ja")     as string) || "",
+    sentSubtitle_ja: (formData.get("sentSubtitle_ja") as string) || "",
+    sendAnother_ja: (formData.get("sendAnother_ja") as string) || "",
   };
   await setDoc(doc(db, "site", "contact"), contact);
   revalidatePath("/");

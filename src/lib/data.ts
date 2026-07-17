@@ -85,9 +85,26 @@ export type ContactContent = {
   tag_en: string;
   title_en: string;
   subtitle_en: string;
+  name_en: string;
+  emailPlaceholder_en: string;
+  subject_en: string;
+  message_en: string;
+  send_en: string;
+  sent_en: string;
+  sentSubtitle_en: string;
+  sendAnother_en: string;
+  
   tag_ja: string;
   title_ja: string;
   subtitle_ja: string;
+  name_ja: string;
+  emailPlaceholder_ja: string;
+  subject_ja: string;
+  message_ja: string;
+  send_ja: string;
+  sent_ja: string;
+  sentSubtitle_ja: string;
+  sendAnother_ja: string;
 };
 
 export type SiteData = {
@@ -137,9 +154,26 @@ export const defaultContact: ContactContent = {
   tag_en: "Get in touch",
   title_en: "Let's Connect",
   subtitle_en: "Open to internships, freelance work, and collaboration on interesting projects. Have an idea? Let's build it together.",
+  name_en: "Your Name",
+  emailPlaceholder_en: "Your Email",
+  subject_en: "Subject",
+  message_en: "Your Message",
+  send_en: "Send Message →",
+  sent_en: "Message Sent!",
+  sentSubtitle_en: "Thanks for reaching out. I'll get back to you as soon as possible.",
+  sendAnother_en: "← Send another message",
+  
   tag_ja: "お気軽にどうぞ",
   title_ja: "ご連絡ください",
   subtitle_ja: "インターンシップ、フリーランス、プロジェクトのコラボレーションを受け付けています。アイデアがあればぜひ一緒に作りましょう。",
+  name_ja: "お名前",
+  emailPlaceholder_ja: "メールアドレス",
+  subject_ja: "件名",
+  message_ja: "メッセージ",
+  send_ja: "送信する →",
+  sent_ja: "送信しました！",
+  sentSubtitle_ja: "ご連絡ありがとうございます。できるだけ早くご返信します。",
+  sendAnother_ja: "← 別のメッセージを送る",
 };
 
 const defaultLanguageContent: LandingLanguageContent = {
