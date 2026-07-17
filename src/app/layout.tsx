@@ -92,6 +92,7 @@ export default async function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         <style dangerouslySetInnerHTML={{ __html: cssVars }} />
