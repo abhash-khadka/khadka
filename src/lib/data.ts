@@ -92,6 +92,7 @@ export type SiteData = {
   portfolio: PortfolioItem[];
   messages: Message[];
   theme: ThemeColors;
+  lightTheme: ThemeColors;
 };
 
 export const defaultTheme: ThemeColors = {
@@ -104,6 +105,18 @@ export const defaultTheme: ThemeColors = {
   textPrimary: "#ffffff",
   textSecondary: "#9ca3af",
   borderColor: "#1f2937",
+};
+
+export const defaultLightTheme: ThemeColors = {
+  bgPrimary: "#FAFAF9",
+  bgSecondary: "#F5F5F4",
+  bgCard: "#FFFFFF",
+  bgNav: "#FFFFFF",
+  bgFooter: "#F8F8F8",
+  accent: "#D9A05B",
+  textPrimary: "#111827",
+  textSecondary: "#6B7280",
+  borderColor: "#E5E7EB",
 };
 
 const defaultLanguageContent: LandingLanguageContent = {
@@ -128,6 +141,7 @@ export async function getData(): Promise<SiteData> {
     portfolio: [],
     messages: [],
     theme: defaultTheme,
+    lightTheme: defaultLightTheme,
   };
 
   try {
@@ -182,7 +196,13 @@ export async function getData(): Promise<SiteData> {
     // Fetch Theme
     const themeDoc = await getDoc(doc(db, "site", "theme"));
     if (themeDoc.exists()) {
-      data.theme = { ...defaultTheme, ...themeDoc.data() } as ThemeColors;
+      const dbTheme = themeDoc.data();
+      if (dbTheme.dark && dbTheme.light) {
+        data.theme = { ...defaultTheme, ...dbTheme.dark } as ThemeColors;
+        data.lightTheme = { ...defaultLightTheme, ...dbTheme.light } as ThemeColors;
+      } else {
+        data.theme = { ...defaultTheme, ...dbTheme } as ThemeColors;
+      }
     }
 
     // Sort arrays by id (timestamp) descending

@@ -269,15 +269,28 @@ export async function markMessageReplied(id: number) {
 
 export async function updateThemeColors(formData: FormData) {
   const theme = {
-    bgPrimary: formData.get("bgPrimary") as string,
-    bgSecondary: formData.get("bgSecondary") as string,
-    bgCard: formData.get("bgCard") as string,
-    bgNav: formData.get("bgNav") as string,
-    bgFooter: formData.get("bgFooter") as string,
-    accent: formData.get("accent") as string,
-    textPrimary: formData.get("textPrimary") as string,
-    textSecondary: formData.get("textSecondary") as string,
-    borderColor: formData.get("borderColor") as string,
+    dark: {
+      bgPrimary: formData.get("dark_bgPrimary") as string,
+      bgSecondary: formData.get("dark_bgSecondary") as string,
+      bgCard: formData.get("dark_bgCard") as string,
+      bgNav: formData.get("dark_bgNav") as string,
+      bgFooter: formData.get("dark_bgFooter") as string,
+      accent: formData.get("dark_accent") as string,
+      textPrimary: formData.get("dark_textPrimary") as string,
+      textSecondary: formData.get("dark_textSecondary") as string,
+      borderColor: formData.get("dark_borderColor") as string,
+    },
+    light: {
+      bgPrimary: formData.get("light_bgPrimary") as string,
+      bgSecondary: formData.get("light_bgSecondary") as string,
+      bgCard: formData.get("light_bgCard") as string,
+      bgNav: formData.get("light_bgNav") as string,
+      bgFooter: formData.get("light_bgFooter") as string,
+      accent: formData.get("light_accent") as string,
+      textPrimary: formData.get("light_textPrimary") as string,
+      textSecondary: formData.get("light_textSecondary") as string,
+      borderColor: formData.get("light_borderColor") as string,
+    }
   };
   await setDoc(doc(db, "site", "theme"), theme);
   revalidatePath("/");

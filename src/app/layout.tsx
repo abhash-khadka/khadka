@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import PublicLayout from "@/components/PublicLayout";
-import { getData, defaultTheme } from "@/lib/data";
+import { getData, defaultTheme, defaultLightTheme } from "@/lib/data";
 import "./globals.css";
 
 const inter = Inter({
@@ -65,9 +65,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   let theme = defaultTheme;
+  let lightTheme = defaultLightTheme;
   try {
     const data = await getData();
     theme = data.theme;
+    lightTheme = data.lightTheme || defaultLightTheme;
   } catch {
     // fallback to default
   }
@@ -85,6 +87,20 @@ export default async function RootLayout({
       --border-color: ${theme.borderColor};
       --background: ${theme.bgPrimary};
       --foreground: ${theme.textPrimary};
+    }
+    
+    :root.light {
+      --bg-primary: ${lightTheme.bgPrimary};
+      --bg-secondary: ${lightTheme.bgSecondary};
+      --bg-card: ${lightTheme.bgCard};
+      --bg-nav: ${lightTheme.bgNav};
+      --bg-footer: ${lightTheme.bgFooter};
+      --color-accent: ${lightTheme.accent};
+      --text-primary: ${lightTheme.textPrimary};
+      --text-secondary: ${lightTheme.textSecondary};
+      --border-color: ${lightTheme.borderColor};
+      --background: ${lightTheme.bgPrimary};
+      --foreground: ${lightTheme.textPrimary};
     }
   `;
 

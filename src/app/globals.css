@@ -14,19 +14,7 @@
   --foreground: #ffffff;
 }
 
-:root.light {
-  --bg-primary: #FAFAF9;
-  --bg-secondary: #F5F5F4;
-  --bg-card: #FFFFFF;
-  --bg-nav: #FFFFFF;
-  --bg-footer: #F8F8F8;
-  --color-accent: #D9A05B;
-  --text-primary: #111827;
-  --text-secondary: #6B7280;
-  --border-color: #E5E7EB;
-  --background: #FAFAF9;
-  --foreground: #111827;
-}
+
 
 body {
   background: var(--background);
