@@ -45,22 +45,39 @@ export default function Portfolio({ projects }: { projects: PortfolioItem[] }) {
         </div>
 
         {/* Project Grid */}
-        <div className="grid grid-cols-2 gap-4 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project) => {
-              const title = project[`title_${lang}`];
+              const title = project[`title_${lang}` as keyof PortfolioItem] as string || project.title_en;
+              // strip HTML for excerpt preview
+              const rawOverview = project[`overview_${lang}` as keyof PortfolioItem] as string || project.overview_en || "";
+              const excerpt = rawOverview.replace(/<[^>]*>?/gm, '');
+
               return (
-                <Link href={`/portfolio/${project.id}`} key={project.id} className="group relative overflow-hidden rounded-md cursor-pointer block" style={{ background: "var(--bg-card)" }}>
-                  <div 
-                    className="h-[200px] md:h-[300px] w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100 flex items-center justify-center"
-                    style={project.image ? { backgroundImage: `url(${project.image})` } : {}}
-                  >
-                    {!project.image && <span className="text-xl font-bold" style={{ color: "var(--border-color)" }}>PORTFOLIO</span>}
+                <Link href={`/portfolio/${project.id}`} key={project.id} className="rounded-sm overflow-hidden group flex flex-col cursor-pointer hover:-translate-y-1 transition-transform duration-300 h-full" style={{ background: "var(--bg-card)" }}>
+                  <div className="h-32 md:h-48 overflow-hidden flex-shrink-0 flex items-center justify-center" style={{ background: "var(--bg-secondary)" }}>
+                    {project.image ? (
+                      <img 
+                        src={project.image} 
+                        alt={title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <span className="text-2xl font-bold" style={{ color: "var(--border-color)" }}>PORTFOLIO</span>
+                    )}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                    <div className="p-4 md:p-6">
-                      <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--color-accent)" }}>{project.category}</p>
-                      <h3 className="text-sm md:text-xl font-bold text-white">{title}</h3>
+                  <div className="p-4 md:p-8 flex flex-col flex-grow">
+                    <p className="text-[10px] md:text-xs font-semibold tracking-widest uppercase mb-2 md:mb-3" style={{ color: "var(--color-accent)" }}>
+                      {project.category}
+                    </p>
+                    <h3 className="text-sm md:text-xl font-bold mb-2 md:mb-4 line-clamp-2" style={{ color: "var(--text-primary)" }}>
+                      {title}
+                    </h3>
+                    <p className="text-xs md:text-sm leading-relaxed mb-4 md:mb-6 line-clamp-2 md:line-clamp-3" style={{ color: "var(--text-secondary)" }}>
+                      {excerpt}
+                    </p>
+                    <div className="flex items-center text-xs md:text-sm font-medium group-hover:opacity-70 transition-colors mt-auto" style={{ color: "var(--color-accent)" }}>
+                      <span>{lang === "ja" ? "詳細を見る" : "View Details"}</span> <span className="ml-1 md:ml-2 group-hover:translate-x-1 transition-transform">→</span>
                     </div>
                   </div>
                 </Link>

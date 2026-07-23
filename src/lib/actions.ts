@@ -43,15 +43,28 @@ export async function checkAuth() {
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────
 
-async function uploadImage(file: File | null): Promise<string | null> {
-  if (!file || file.size === 0) return null;
-  const buffer = await file.arrayBuffer();
-  const bytes = new Uint8Array(buffer);
-  const ext = file.name.split('.').pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-  const storageRef = ref(storage, `images/${fileName}`);
-  await uploadBytes(storageRef, bytes);
-  return await getDownloadURL(storageRef);
+async function uploadImage(file: any): Promise<string | null> {
+  if (!file || typeof file === 'string' || !file.name || file.size === 0 || typeof file.arrayBuffer !== 'function') {
+    return null;
+  }
+  try {
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    const ext = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+    const storageRef = ref(storage, `images/${fileName}`);
+    
+    // Pass metadata so Firebase knows it's an image, not an octet-stream attachment
+    const metadata = {
+      contentType: file.type || 'image/jpeg',
+    };
+    
+    await uploadBytes(storageRef, bytes, metadata);
+    return await getDownloadURL(storageRef);
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    return null; // Return null instead of crashing the whole action
+  }
 }
 
 function generateSlug(title: string, fallbackId: number): string {

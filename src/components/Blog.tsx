@@ -21,12 +21,12 @@ export default function Blog({ posts }: { posts: BlogPost[] }) {
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
           {posts.map((post) => {
-            const title = post[`title_${lang}`];
-            const excerpt = post[`excerpt_${lang}`];
+            const title = post[`title_${lang}` as keyof BlogPost] as string || post.title_en;
+            const excerpt = post[`excerpt_${lang}` as keyof BlogPost] as string || post.excerpt_en;
 
             return (
-              <Link href={`/blogs/${post.slug || post.id}`} key={post.id} className="rounded-sm overflow-hidden group block cursor-pointer hover:-translate-y-1 transition-transform duration-300" style={{ background: "var(--bg-card)" }}>
-                <div className="h-32 md:h-48 overflow-hidden flex items-center justify-center" style={{ background: "var(--bg-secondary)" }}>
+              <Link href={`/blogs/${post.slug || post.id}`} key={post.id} className="rounded-sm overflow-hidden group flex flex-col cursor-pointer hover:-translate-y-1 transition-transform duration-300 h-full" style={{ background: "var(--bg-card)" }}>
+                <div className="h-32 md:h-48 overflow-hidden flex-shrink-0 flex items-center justify-center" style={{ background: "var(--bg-secondary)" }}>
                   {post.image ? (
                     <img 
                       src={post.image} 
@@ -37,7 +37,7 @@ export default function Blog({ posts }: { posts: BlogPost[] }) {
                     <span className="text-2xl font-bold" style={{ color: "var(--border-color)" }}>BLOG</span>
                   )}
                 </div>
-                <div className="p-4 md:p-8">
+                <div className="p-4 md:p-8 flex flex-col flex-grow">
                   <p className="text-[10px] md:text-xs font-semibold tracking-widest uppercase mb-2 md:mb-3" style={{ color: "var(--color-accent)" }}>
                     {post.date}
                   </p>
@@ -47,7 +47,7 @@ export default function Blog({ posts }: { posts: BlogPost[] }) {
                   <p className="text-xs md:text-sm leading-relaxed mb-4 md:mb-6 line-clamp-2 md:line-clamp-3" style={{ color: "var(--text-secondary)" }}>
                     {excerpt}
                   </p>
-                  <div className="flex items-center text-xs md:text-sm font-medium group-hover:opacity-70 transition-colors" style={{ color: "var(--color-accent)" }}>
+                  <div className="flex items-center text-xs md:text-sm font-medium group-hover:opacity-70 transition-colors mt-auto" style={{ color: "var(--color-accent)" }}>
                     <span>{t.blog.read}</span> <span className="ml-1 md:ml-2 group-hover:translate-x-1 transition-transform">→</span>
                   </div>
                 </div>

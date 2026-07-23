@@ -6,7 +6,10 @@ import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import TiptapLink from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import Image from "@tiptap/extension-image";
 import { useEffect, useRef, useState } from "react";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "@/lib/firebase";
 
 interface RichTextEditorProps {
   name: string;
@@ -59,6 +62,8 @@ export default function RichTextEditor({
   placeholder = "Write your content here...",
 }: RichTextEditorProps) {
   const [mounted, setMounted] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -77,6 +82,11 @@ export default function RichTextEditor({
         HTMLAttributes: {
           class: "text-[#c9a84c] underline cursor-pointer",
           rel: "noopener noreferrer",
+        },
+      }),
+      Image.configure({
+        HTMLAttributes: {
+          class: "max-w-full h-auto rounded-sm my-4 border border-gray-800",
         },
       }),
     ],
@@ -109,6 +119,37 @@ export default function RichTextEditor({
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
     } else {
       editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+    }
+  };
+
+  const handleImageUrl = () => {
+    if (!editor) return;
+    const url = window.prompt("Enter Image URL:");
+    if (url) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editor) return;
+
+    try {
+      setIsUploading(true);
+      const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "")}`;
+      const storageRef = ref(storage, `editor-images/${filename}`);
+      
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      
+      editor.chain().focus().setImage({ src: url }).run();
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      alert("Failed to upload image.");
+    } finally {
+      setIsUploading(false);
+      // Reset input
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -289,6 +330,31 @@ export default function RichTextEditor({
           </svg>
         </ToolbarButton>
 
+        {/* Image URL */}
+        <ToolbarButton
+          onClick={handleImageUrl}
+          title="Insert Image from URL"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+          </svg>
+        </ToolbarButton>
+
+        {/* Image Upload */}
+        <ToolbarButton
+          onClick={() => fileInputRef.current?.click()}
+          title="Upload Image"
+          disabled={isUploading}
+        >
+          {isUploading ? (
+            <span className="text-xs font-bold animate-pulse">...</span>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+            </svg>
+          )}
+        </ToolbarButton>
+
         <Divider />
 
         {/* Undo */}
@@ -344,6 +410,15 @@ export default function RichTextEditor({
 
       {/* Hidden input to submit content via form */}
       <input type="hidden" name={name} value={value} />
+      
+      {/* Hidden file input for image upload */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        hidden 
+        accept="image/*" 
+        onChange={handleImageUpload} 
+      />
     </div>
   );
 }

@@ -24,15 +24,17 @@ export default function BlogClient({ post }: { post: BlogPost }) {
           {title}
         </h1>
         
-        <div className="h-[400px] md:h-[500px] w-full rounded-sm overflow-hidden mb-12 flex items-center justify-center border" style={{ background: "var(--bg-secondary)", borderColor: "var(--border-color)" }}>
+        <div className="mb-12 w-full">
           {post.image ? (
             <img 
               src={post.image} 
               alt={title}
-              className="w-full h-full object-cover"
+              className="w-full h-auto rounded-sm"
             />
           ) : (
-            <span className="text-4xl font-bold opacity-30" style={{ color: "var(--text-secondary)" }}>{t.blogDetail.noImage}</span>
+            <div className="h-[300px] w-full rounded-sm flex items-center justify-center border" style={{ background: "var(--bg-secondary)", borderColor: "var(--border-color)" }}>
+              <span className="text-4xl font-bold opacity-30" style={{ color: "var(--text-secondary)" }}>{t.blogDetail.noImage}</span>
+            </div>
           )}
         </div>
         
