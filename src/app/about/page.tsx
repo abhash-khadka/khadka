@@ -6,6 +6,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About Me",
   description: "Learn more about my journey, skills, and experience as an IT student and developer.",
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 export default async function AboutPage() {

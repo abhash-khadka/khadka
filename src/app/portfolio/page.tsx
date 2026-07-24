@@ -5,6 +5,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Portfolio",
   description: "A showcase of my recent web development, design, and software projects.",
+  alternates: {
+    canonical: "/portfolio",
+  },
 };
 
 export default async function PortfolioPage() {

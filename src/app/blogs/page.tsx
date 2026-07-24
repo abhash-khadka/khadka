@@ -5,6 +5,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Blog",
   description: "Thoughts, tutorials, and insights on software development and technology.",
+  alternates: {
+    canonical: "/blogs",
+  },
 };
 
 export default async function BlogsPage() {

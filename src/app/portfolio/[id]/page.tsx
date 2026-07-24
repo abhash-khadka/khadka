@@ -17,21 +17,27 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   // Strip HTML from overview for description
   const cleanDescription = overview.replace(/<[^>]+>/g, '').substring(0, 160) + "...";
+  const canonicalUrl = `/portfolio/${project.id}`;
+  const defaultImage = "https://abhashkhadka.com.np/logo.png";
+  const ogImage = project.image || defaultImage;
 
   return {
     title,
     description: cleanDescription,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description: cleanDescription,
       type: "article",
-      images: project.image ? [{ url: project.image }] : undefined,
+      images: [{ url: ogImage }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: cleanDescription,
-      images: project.image ? [project.image] : undefined,
+      images: [ogImage],
     },
   };
 }
@@ -45,5 +51,27 @@ export default async function PortfolioProject({ params }: { params: Promise<{ i
     notFound();
   }
 
-  return <PortfolioClient project={project} />;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: project.title_en || "Portfolio Project",
+    description: project.overview_en ? project.overview_en.replace(/<[^>]+>/g, '') : "",
+    image: project.image ? [project.image] : ["https://abhashkhadka.com.np/logo.png"],
+    author: {
+      "@type": "Person",
+      name: "Abhash Khadka",
+      url: "https://abhashkhadka.com.np/"
+    },
+    url: `https://abhashkhadka.com.np/portfolio/${project.id}`
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <PortfolioClient project={project} />
+    </>
+  );
 }

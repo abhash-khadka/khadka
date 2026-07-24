@@ -5,6 +5,9 @@ import { getData } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with me for freelance projects, collaborations, or just to say hi.",
+  alternates: {
+    canonical: "/contact",
+  },
 };
 
 export default async function ContactPage() {

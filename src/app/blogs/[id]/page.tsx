@@ -16,22 +16,28 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   const title = post.title_en || "Blog Post";
   const excerpt = post.excerpt_en || "";
+  const canonicalUrl = `/blogs/${post.slug || post.id}`;
+  const defaultImage = "https://abhashkhadka.com.np/logo.png";
+  const ogImage = post.image || defaultImage;
 
   return {
     title,
     description: excerpt,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description: excerpt,
       type: "article",
       publishedTime: post.date,
-      images: post.image ? [{ url: post.image }] : undefined,
+      images: [{ url: ogImage }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: excerpt,
-      images: post.image ? [post.image] : undefined,
+      images: [ogImage],
     },
   };
 }
@@ -48,5 +54,27 @@ export default async function BlogPost({ params }: { params: Promise<{ id: strin
     notFound();
   }
 
-  return <BlogClient post={post} />;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title_en || "Blog Post",
+    description: post.excerpt_en || "",
+    image: post.image ? [post.image] : ["https://abhashkhadka.com.np/logo.png"],
+    datePublished: post.date,
+    author: {
+      "@type": "Person",
+      name: "Abhash Khadka",
+      url: "https://abhashkhadka.com.np/"
+    }
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <BlogClient post={post} />
+    </>
+  );
 }
