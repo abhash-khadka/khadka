@@ -1,6 +1,22 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  # Let Netlify's Next.js Runtime handle the publish directory automatically
+  # Removing publish = ".next" ensures proper SSR and API route handling
+
+[build.environment]
+  # Optimize memory usage during build to prevent out-of-memory errors
+  NODE_OPTIONS = "--max_old_space_size=4096"
+  # Disable Next.js telemetry to speed up build slightly
+  NEXT_TELEMETRY_DISABLED = "1"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Add standard security headers for better performance/security scoring
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
