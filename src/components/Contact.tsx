@@ -24,8 +24,8 @@ function ContactForm({ data }: { data?: ContactContent }) {
   const sentSubtitleLabel = data ? (lang === "ja" ? data.sentSubtitle_ja : data.sentSubtitle_en) : t.contact.sentSubtitle;
   const sendAnotherLabel = data ? (lang === "ja" ? data.sendAnother_ja : data.sendAnother_en) : t.contact.sendAnother;
 
-  const location = data?.location || "Hiroshima, Japan";
-  const email = data?.email || "info.abhashk@gmail.com";
+  const location = data ? (lang === "ja" ? data.location_ja : data.location_en) : "Hiroshima, Japan";
+  const email = data ? (lang === "ja" ? data.email_ja : data.email_en) : "info.abhashk@gmail.com";
 
   return (
     <section id="contact" className="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 lg:px-8" style={{ background: "var(--bg-secondary)" }}>

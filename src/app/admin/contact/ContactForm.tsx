@@ -19,10 +19,11 @@ export default function ContactForm({ data }: { data: ContactContent }) {
     }
   }, [searchParams]);
 
-  const [location, setLocation] = useState("");
-  const [email, setEmail] = useState("");
-  
   // English Fields
+  const [location_en, setLocationEn] = useState("");
+  const [email_en, setEmailEn] = useState("");
+  
+  // Other English Fields
   const [tag_en, setTagEn] = useState("");
   const [title_en, setTitleEn] = useState("");
   const [subtitle_en, setSubtitleEn] = useState("");
@@ -36,6 +37,8 @@ export default function ContactForm({ data }: { data: ContactContent }) {
   const [sendAnother_en, setSendAnotherEn] = useState("");
 
   // Japanese Fields
+  const [location_ja, setLocationJa] = useState("");
+  const [email_ja, setEmailJa] = useState("");
   const [tag_ja, setTagJa] = useState("");
   const [title_ja, setTitleJa] = useState("");
   const [subtitle_ja, setSubtitleJa] = useState("");
@@ -52,6 +55,9 @@ export default function ContactForm({ data }: { data: ContactContent }) {
   const handleTranslateAllToJa = async () => {
     setIsTranslatingAll(true);
     try {
+      if (location_en && !location_ja) setLocationJa(await translateText(location_en, "English", "Japanese"));
+      if (email_en && !email_ja) setEmailJa(email_en); // Usually email doesn't need translation, just copy
+
       if (tag_en && !tag_ja) setTagJa(await translateText(tag_en, "English", "Japanese"));
       if (title_en && !title_ja) setTitleJa(await translateText(title_en, "English", "Japanese"));
       if (subtitle_en && !subtitle_ja) setSubtitleJa(await translateText(subtitle_en, "English", "Japanese"));
@@ -72,6 +78,9 @@ export default function ContactForm({ data }: { data: ContactContent }) {
   const handleTranslateAllToEn = async () => {
     setIsTranslatingAll(true);
     try {
+      if (location_ja && !location_en) setLocationEn(await translateText(location_ja, "Japanese", "English"));
+      if (email_ja && !email_en) setEmailEn(email_ja); // Usually email doesn't need translation, just copy
+
       if (tag_ja && !tag_en) setTagEn(await translateText(tag_ja, "Japanese", "English"));
       if (title_ja && !title_en) setTitleEn(await translateText(title_ja, "Japanese", "English"));
       if (subtitle_ja && !subtitle_en) setSubtitleEn(await translateText(subtitle_ja, "Japanese", "English"));
@@ -90,8 +99,8 @@ export default function ContactForm({ data }: { data: ContactContent }) {
   };
   useEffect(() => {
     if (data) {
-      setLocation(data.location ?? "");
-      setEmail(data.email ?? "");
+      setLocationEn(data.location_en ?? "");
+      setEmailEn(data.email_en ?? "");
       setTagEn(data.tag_en ?? "");
       setTitleEn(data.title_en ?? "");
       setSubtitleEn(data.subtitle_en ?? "");
@@ -104,6 +113,8 @@ export default function ContactForm({ data }: { data: ContactContent }) {
       setSentSubtitleEn(data.sentSubtitle_en ?? "");
       setSendAnotherEn(data.sendAnother_en ?? "");
       
+      setLocationJa(data.location_ja ?? "");
+      setEmailJa(data.email_ja ?? "");
       setTagJa(data.tag_ja ?? "");
       setTitleJa(data.title_ja ?? "");
       setSubtitleJa(data.subtitle_ja ?? "");
@@ -127,6 +138,11 @@ export default function ContactForm({ data }: { data: ContactContent }) {
             <h2 className="text-white font-bold text-lg flex items-center gap-2">
               <span className="text-[#c9a84c]">⬤</span> Contact Section (EN)
             </h2>
+            <h3 className="text-white font-bold text-md pt-2 border-t border-gray-800">General Info</h3>
+            <FieldWithButton label="Location" name="location_en_display" value={location_en} onChange={(e) => setLocationEn(e.target.value)} onTranslate={setLocationJa} sourceLang="English" targetLang="Japanese" />
+            <FieldWithButton label="Email" name="email_en_display" value={email_en} onChange={(e) => setEmailEn(e.target.value)} onTranslate={setEmailJa} sourceLang="English" targetLang="Japanese" />
+            
+            <h3 className="text-white font-bold text-md pt-4 border-t border-gray-800">Content</h3>
             <FieldWithButton label="Tag" name="tag_en_display" value={tag_en} onChange={(e) => setTagEn(e.target.value)} onTranslate={setTagJa} sourceLang="English" targetLang="Japanese" />
             <FieldWithButton label="Title" name="title_en_display" value={title_en} onChange={(e) => setTitleEn(e.target.value)} onTranslate={setTitleJa} sourceLang="English" targetLang="Japanese" />
             <FieldWithButton label="Subtitle" name="subtitle_en_display" value={subtitle_en} onChange={(e) => setSubtitleEn(e.target.value)} onTranslate={setSubtitleJa} sourceLang="English" targetLang="Japanese" textarea />
@@ -152,6 +168,11 @@ export default function ContactForm({ data }: { data: ContactContent }) {
             <h2 className="text-white font-bold text-lg flex items-center gap-2">
               <span className="text-[#c9a84c]">⬤</span> Contact Section (JA)
             </h2>
+            <h3 className="text-white font-bold text-md pt-2 border-t border-gray-800">General Info</h3>
+            <FieldWithButton label="Location" name="location_ja_display" value={location_ja} onChange={(e) => setLocationJa(e.target.value)} onTranslate={setLocationEn} sourceLang="Japanese" targetLang="English" />
+            <FieldWithButton label="Email" name="email_ja_display" value={email_ja} onChange={(e) => setEmailJa(e.target.value)} onTranslate={setEmailEn} sourceLang="Japanese" targetLang="English" />
+            
+            <h3 className="text-white font-bold text-md pt-4 border-t border-gray-800">Content</h3>
             <FieldWithButton label="Tag" name="tag_ja_display" value={tag_ja} onChange={(e) => setTagJa(e.target.value)} onTranslate={setTagEn} sourceLang="Japanese" targetLang="English" />
             <FieldWithButton label="Title" name="title_ja_display" value={title_ja} onChange={(e) => setTitleJa(e.target.value)} onTranslate={setTitleEn} sourceLang="Japanese" targetLang="English" />
             <FieldWithButton label="Subtitle" name="subtitle_ja_display" value={subtitle_ja} onChange={(e) => setSubtitleJa(e.target.value)} onTranslate={setSubtitleEn} sourceLang="Japanese" targetLang="English" textarea />
@@ -188,20 +209,6 @@ export default function ContactForm({ data }: { data: ContactContent }) {
             Save All Changes
           </button>
         </div>
-
-        <section className="bg-[#111111] border border-gray-800 rounded-sm p-6 space-y-5 mb-10">
-          <h2 className="text-white font-bold text-lg flex items-center gap-2">
-            <span className="text-[#c9a84c]">⬤</span> General Info
-          </h2>
-          <div>
-            <label className="block text-xs font-semibold tracking-widest text-gray-400 uppercase mb-2">Location</label>
-            <input type="text" name="location" value={location} onChange={(e) => setLocation(e.target.value)} className="w-full bg-[#0a0a0a] border border-gray-800 text-white p-3 rounded-sm focus:outline-none focus:border-[#c9a84c] transition-colors" />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold tracking-widest text-gray-400 uppercase mb-2">Email</label>
-            <input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-[#0a0a0a] border border-gray-800 text-white p-3 rounded-sm focus:outline-none focus:border-[#c9a84c] transition-colors" />
-          </div>
-        </section>
 
         {/* Language Tabs */}
         <div className="flex items-center justify-between border-b border-gray-800 mb-6">
@@ -249,6 +256,8 @@ export default function ContactForm({ data }: { data: ContactContent }) {
         </div>
 
         {/* Hidden inputs to pass data back on submit since they might not be visible in DOM */}
+        <input type="hidden" name="location_en" value={location_en} />
+        <input type="hidden" name="email_en" value={email_en} />
         <input type="hidden" name="tag_en" value={tag_en} />
         <input type="hidden" name="title_en" value={title_en} />
         <input type="hidden" name="subtitle_en" value={subtitle_en} />
@@ -261,6 +270,8 @@ export default function ContactForm({ data }: { data: ContactContent }) {
         <input type="hidden" name="sentSubtitle_en" value={sentSubtitle_en} />
         <input type="hidden" name="sendAnother_en" value={sendAnother_en} />
 
+        <input type="hidden" name="location_ja" value={location_ja} />
+        <input type="hidden" name="email_ja" value={email_ja} />
         <input type="hidden" name="tag_ja" value={tag_ja} />
         <input type="hidden" name="title_ja" value={title_ja} />
         <input type="hidden" name="subtitle_ja" value={subtitle_ja} />

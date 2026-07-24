@@ -370,8 +370,8 @@ Text to translate:
 
 export async function updateContactContent(formData: FormData) {
   const contact = {
-    location:    (formData.get("location")    as string) || "",
-    email:       (formData.get("email")       as string) || "",
+    location_en: (formData.get("location_en") as string) || "",
+    email_en:    (formData.get("email_en")    as string) || "",
     tag_en:      (formData.get("tag_en")      as string) || "",
     title_en:    (formData.get("title_en")    as string) || "",
     subtitle_en: (formData.get("subtitle_en") as string) || "",
@@ -384,6 +384,8 @@ export async function updateContactContent(formData: FormData) {
     sentSubtitle_en: (formData.get("sentSubtitle_en") as string) || "",
     sendAnother_en: (formData.get("sendAnother_en") as string) || "",
     
+    location_ja: (formData.get("location_ja") as string) || "",
+    email_ja:    (formData.get("email_ja")    as string) || "",
     tag_ja:      (formData.get("tag_ja")      as string) || "",
     title_ja:    (formData.get("title_ja")    as string) || "",
     subtitle_ja: (formData.get("subtitle_ja") as string) || "",

@@ -80,8 +80,8 @@ export type LandingLanguageContent = {
 };
 
 export type ContactContent = {
-  location: string;
-  email: string;
+  location_en: string;
+  email_en: string;
   tag_en: string;
   title_en: string;
   subtitle_en: string;
@@ -94,6 +94,8 @@ export type ContactContent = {
   sentSubtitle_en: string;
   sendAnother_en: string;
   
+  location_ja: string;
+  email_ja: string;
   tag_ja: string;
   title_ja: string;
   subtitle_ja: string;
@@ -149,8 +151,8 @@ export const defaultLightTheme: ThemeColors = {
 };
 
 export const defaultContact: ContactContent = {
-  location: "Hiroshima, Japan",
-  email: "info.abhashk@gmail.com",
+  location_en: "Hiroshima, Japan",
+  email_en: "info.abhashk@gmail.com",
   tag_en: "Get in touch",
   title_en: "Let's Connect",
   subtitle_en: "Open to internships, freelance work, and collaboration on interesting projects. Have an idea? Let's build it together.",
@@ -163,6 +165,8 @@ export const defaultContact: ContactContent = {
   sentSubtitle_en: "Thanks for reaching out. I'll get back to you as soon as possible.",
   sendAnother_en: "← Send another message",
   
+  location_ja: "広島県、日本",
+  email_ja: "info.abhashk@gmail.com",
   tag_ja: "お気軽にどうぞ",
   title_ja: "ご連絡ください",
   subtitle_ja: "インターンシップ、フリーランス、プロジェクトのコラボレーションを受け付けています。アイデアがあればぜひ一緒に作りましょう。",
@@ -251,9 +255,14 @@ export const getData = cache(async (): Promise<SiteData> => {
       data.portfolio.push(p as PortfolioItem);
     });
 
-    // Parse Contact
     if (contactDoc.exists()) {
-      data.contact = { ...defaultContact, ...contactDoc.data() } as ContactContent;
+      const raw = contactDoc.data() as Record<string, string>;
+      // Backward-compat: if old single-language fields exist, carry them over
+      if (raw.location && !raw.location_en) raw.location_en = raw.location;
+      if (raw.location && !raw.location_ja) raw.location_ja = raw.location;
+      if (raw.email && !raw.email_en) raw.email_en = raw.email;
+      if (raw.email && !raw.email_ja) raw.email_ja = raw.email;
+      data.contact = { ...defaultContact, ...raw } as ContactContent;
     }
 
     // Parse Theme
