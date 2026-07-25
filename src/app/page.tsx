@@ -4,6 +4,7 @@ import About from "@/components/About";
 import Quote from "@/components/Quote";
 import Blog from "@/components/Blog";
 import Contact from "@/components/Contact";
+import WelcomePopup from "@/components/WelcomePopup";
 import { getData } from "@/lib/data";
 import { Metadata } from "next";
 
@@ -47,6 +48,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {data.popup.enabled && <WelcomePopup popup={data.popup} />}
       <Hero data={data.landing} />
       <Portfolio projects={data.portfolio} />
       <About data={data.landing} />

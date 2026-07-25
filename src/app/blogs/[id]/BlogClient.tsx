@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { BlogPost } from "@/lib/data";
+import { BlogPost, BlogComment } from "@/lib/data";
 import { useLanguage } from "@/contexts/LanguageContext";
+import BlogInteractions from "@/components/BlogInteractions";
 
-export default function BlogClient({ post }: { post: BlogPost }) {
+export default function BlogClient({ post, comments }: { post: BlogPost, comments: BlogComment[] }) {
   const { lang, t } = useLanguage();
   const title = post[`title_${lang}` as keyof BlogPost] as string || post.title_en;
   const content = post[`content_${lang}` as keyof BlogPost] as string || post.content_en;
@@ -51,6 +52,12 @@ export default function BlogClient({ post }: { post: BlogPost }) {
             "--tw-prose-code": "var(--color-accent)",
           } as React.CSSProperties}
           dangerouslySetInnerHTML={{ __html: content || "" }}
+        />
+        
+        <BlogInteractions 
+          slug={post.slug || post.id.toString()} 
+          initialLikes={post.likes || 0} 
+          comments={comments} 
         />
       </div>
     </main>

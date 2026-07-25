@@ -46,7 +46,19 @@ export type BlogPost = {
   excerpt_ja: string;
   content_en: string;
   content_ja: string;
+  likes?: number;
 };
+
+export type BlogComment = {
+  id: number;
+  blogSlug: string;
+  name: string;
+  content: string;
+  date: string;
+  approved: boolean;
+  parentId?: number;
+};
+
 
 export type PortfolioItem = {
   id: number;
@@ -109,6 +121,18 @@ export type ContactContent = {
   sendAnother_ja: string;
 };
 
+export type PopupContent = {
+  enabled: boolean;
+  title_en: string;
+  title_ja: string;
+  body_en: string;
+  body_ja: string;
+  buttonLabel_en: string;
+  buttonLabel_ja: string;
+  buttonUrl: string;
+  image: string;
+};
+
 export type SiteData = {
   landing: {
     en: LandingLanguageContent;
@@ -124,6 +148,7 @@ export type SiteData = {
   portfolio: PortfolioItem[];
   theme: ThemeColors;
   lightTheme: ThemeColors;
+  popup: PopupContent;
 };
 
 export const defaultTheme: ThemeColors = {
@@ -203,6 +228,17 @@ export const getData = cache(async (): Promise<SiteData> => {
     portfolio: [],
     theme: defaultTheme,
     lightTheme: defaultLightTheme,
+    popup: {
+      enabled: false,
+      title_en: "",
+      title_ja: "",
+      body_en: "",
+      body_ja: "",
+      buttonLabel_en: "",
+      buttonLabel_ja: "",
+      buttonUrl: "",
+      image: "",
+    },
   };
 
   try {
@@ -211,13 +247,15 @@ export const getData = cache(async (): Promise<SiteData> => {
       blogsSnapshot,
       portfolioSnapshot,
       contactDoc,
-      themeDoc
+      themeDoc,
+      popupDoc,
     ] = await Promise.all([
       getDoc(doc(db, "site", "landing")),
       getDocs(collection(db, "blogs")),
       getDocs(collection(db, "portfolio")),
       getDoc(doc(db, "site", "contact")),
-      getDoc(doc(db, "site", "theme"))
+      getDoc(doc(db, "site", "theme")),
+      getDoc(doc(db, "site", "popup")),
     ]);
 
     // Parse Landing
@@ -279,6 +317,11 @@ export const getData = cache(async (): Promise<SiteData> => {
     // Sort arrays by id (timestamp) descending
     data.blogs.sort((a, b) => b.id - a.id);
     data.portfolio.sort((a, b) => b.id - a.id);
+
+    // Parse Popup
+    if (popupDoc.exists()) {
+      data.popup = { ...data.popup, ...popupDoc.data() } as PopupContent;
+    }
   } catch (error) {
     console.error("Error fetching data from Firestore:", error);
   }
@@ -298,4 +341,37 @@ export const getMessages = cache(async (): Promise<Message[]> => {
     console.error("Error fetching messages from Firestore:", error);
   }
   return messages;
+});
+
+export const getApprovedComments = cache(async (slug: string): Promise<BlogComment[]> => {
+  const comments: BlogComment[] = [];
+  try {
+    const commentsSnapshot = await getDocs(collection(db, "comments"));
+    commentsSnapshot.forEach((doc) => {
+      const c = doc.data() as BlogComment;
+      if (c.blogSlug === slug && c.approved) {
+        comments.push(c);
+      }
+    });
+    // Sort by id (timestamp) ascending so oldest are first
+    comments.sort((a, b) => a.id - b.id);
+  } catch (error) {
+    console.error("Error fetching comments from Firestore:", error);
+  }
+  return comments;
+});
+
+export const getAllComments = cache(async (): Promise<BlogComment[]> => {
+  const comments: BlogComment[] = [];
+  try {
+    const commentsSnapshot = await getDocs(collection(db, "comments"));
+    commentsSnapshot.forEach((doc) => {
+      comments.push(doc.data() as BlogComment);
+    });
+    // Sort by id (timestamp) descending so newest are first in admin
+    comments.sort((a, b) => b.id - a.id);
+  } catch (error) {
+    console.error("Error fetching all comments from Firestore:", error);
+  }
+  return comments;
 });

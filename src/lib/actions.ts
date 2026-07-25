@@ -5,7 +5,7 @@ import { BlogPost, PortfolioItem } from "@/lib/data";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { db, storage } from "./firebase";
-import { doc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc, deleteDoc, increment } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -146,6 +146,69 @@ export async function deleteBlogPost(id: number, slug?: string) {
 
   revalidatePath("/");
   revalidatePath("/blogs");
+}
+
+// ─── BLOG INTERACTIONS ────────────────────────────────────────────────────────
+
+export async function incrementLike(slug: string) {
+  try {
+    await updateDoc(doc(db, "blogs", slug), {
+      likes: increment(1)
+    });
+    revalidatePath(`/blogs/${slug}`);
+  } catch (error) {
+    console.error("Error incrementing like:", error);
+  }
+}
+
+export async function addComment(slug: string, formData: FormData) {
+  const id = Date.now();
+  const name = formData.get("name") as string;
+  const content = formData.get("content") as string;
+  const parentIdStr = formData.get("parentId") as string;
+  
+  if (!name || !content) return { success: false, error: "Missing fields" };
+
+  const newComment: any = {
+    id,
+    blogSlug: slug,
+    name,
+    content,
+    date: new Date().toLocaleString("en-US", {
+      month: "short", day: "numeric", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
+    }),
+    approved: false, // requires admin approval
+  };
+
+  if (parentIdStr) {
+    newComment.parentId = parseInt(parentIdStr);
+  }
+
+  try {
+    await setDoc(doc(db, "comments", id.toString()), newComment);
+    revalidatePath(`/blogs/${slug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    return { success: false, error: "Failed to add comment" };
+  }
+}
+
+export async function approveComment(id: number) {
+  await updateDoc(doc(db, "comments", id.toString()), { approved: true });
+  revalidatePath("/admin/comments");
+  // We'd ideally revalidate the specific blog post path, but we don't have the slug here unless we pass it.
+  // We can just revalidate all blogs or the specific one if we know it.
+  revalidatePath("/blogs"); 
+  revalidatePath("/", "layout"); // Overkill but ensures it updates.
+}
+
+export async function deleteComment(id: number) {
+  await deleteDoc(doc(db, "comments", id.toString()));
+  revalidatePath("/admin/comments");
+  revalidatePath("/blogs");
+  revalidatePath("/", "layout");
 }
 
 // ─── PORTFOLIO ───────────────────────────────────────────────────────────────
@@ -402,4 +465,27 @@ export async function updateContactContent(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/contact");
   redirect("/admin/contact?saved=1");
+}
+
+// ─── POPUP ─────────────────────────────────────────────────────────────────
+
+export async function updatePopupContent(formData: FormData) {
+  const imageFile = formData.get("image") as File | null;
+  const uploadedImage = await uploadImage(imageFile);
+
+  const popup = {
+    enabled: formData.get("enabled") === "true",
+    title_en: (formData.get("title_en") as string) || "",
+    title_ja: (formData.get("title_ja") as string) || "",
+    body_en: (formData.get("body_en") as string) || "",
+    body_ja: (formData.get("body_ja") as string) || "",
+    buttonLabel_en: (formData.get("buttonLabel_en") as string) || "",
+    buttonLabel_ja: (formData.get("buttonLabel_ja") as string) || "",
+    buttonUrl: (formData.get("buttonUrl") as string) || "",
+    image: uploadedImage || (formData.get("existingImage") as string) || "",
+  };
+
+  await setDoc(doc(db, "site", "popup"), popup);
+  revalidatePath("/");
+  redirect("/admin/popup?saved=1");
 }

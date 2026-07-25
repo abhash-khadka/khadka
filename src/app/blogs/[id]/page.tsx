@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getData } from "@/lib/data";
+import { getData, getApprovedComments } from "@/lib/data";
 import { Metadata } from "next";
 import BlogClient from "./BlogClient";
 
@@ -68,13 +68,15 @@ export default async function BlogPost({ params }: { params: Promise<{ id: strin
     }
   };
 
+  const comments = await getApprovedComments(post.slug || post.id.toString());
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <BlogClient post={post} />
+      <BlogClient post={post} comments={comments} />
     </>
   );
 }

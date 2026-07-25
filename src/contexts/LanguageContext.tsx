@@ -75,6 +75,22 @@ export const translations = {
       text: '"First, solve the problem. Then, write the code."',
       author: "— John Johnson",
     },
+    blogInteractions: {
+      like: "Like",
+      liked: "Liked",
+      share: "Share",
+      copied: "Link copied!",
+      comments: "Comments",
+      noComments: "No comments yet. Be the first!",
+      addComment: "Add a comment",
+      reply: "Reply",
+      cancelReply: "Cancel Reply",
+      namePlaceholder: "Your Name",
+      commentPlaceholder: "What are your thoughts?",
+      submit: "Post Comment",
+      submitting: "Posting...",
+      pendingApproval: "Your comment is awaiting moderation.",
+    },
   },
   ja: {
     nav: {
@@ -85,11 +101,11 @@ export const translations = {
       contact: "お問い合わせ",
     },
     hero: {
-      cta: "作品を見る",
+      cta: "ポートフォリオを見る",
     },
     portfolio: {
       tag: "コード。構築。デプロイ。繰り返す。",
-      title: "作品集",
+      title: "ポートフォリオ",
       noProjects: "このカテゴリのプロジェクトはまだありません。",
       categories: {
         all: "すべて",
@@ -125,7 +141,7 @@ export const translations = {
       certs: "資格",
     },
     footer: {
-      rights: "全著作権所有。",
+      rights: "All rights reserved。",
     },
     portfolioDetail: {
       visitLive: "ライブサイトを見る",
@@ -145,6 +161,22 @@ export const translations = {
       label: "私の哲学",
       text: "「まず問題を解決する。そのあとでコードを書く。」",
       author: "— ジョン・ジョンソン",
+    },
+    blogInteractions: {
+      like: "いいね",
+      liked: "いいね済",
+      share: "共有",
+      copied: "リンクをコピーしました！",
+      comments: "コメント",
+      noComments: "コメントはまだありません。",
+      addComment: "コメントを追加",
+      reply: "返信する",
+      cancelReply: "キャンセル",
+      namePlaceholder: "お名前",
+      commentPlaceholder: "感想をお聞かせください",
+      submit: "投稿する",
+      submitting: "投稿中...",
+      pendingApproval: "コメントは承認待ちです。",
     },
   },
 };

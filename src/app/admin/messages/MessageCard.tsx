@@ -54,7 +54,26 @@ export function MessageCard({ msg }: { msg: Message }) {
           </p>
           <div className="flex items-center gap-4 flex-wrap">
             <a
-              href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject)}&body=Hi ${encodeURIComponent(msg.name)},%0A%0A`}
+              href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject)}&body=${encodeURIComponent(`Hi ${msg.name},
+
+Thank you for reaching out!
+
+[Your English message here]
+
+Best regards,
+Abhash Khadka
+
+---
+
+${msg.name} 様
+
+お問い合わせありがとうございます。
+
+[ここに日本語のメッセージをご記入ください]
+
+よろしくお願いいたします。
+Abhash Khadka
+`)}`}
               onClick={() => startTransition(() => markMessageReplied(msg.id))}
               className="flex items-center gap-2 bg-[#c9a84c] text-black font-bold px-4 py-2 text-xs tracking-widest uppercase hover:bg-[#b8973b] transition-colors rounded-sm"
             >
