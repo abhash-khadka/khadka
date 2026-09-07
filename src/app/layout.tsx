@@ -14,43 +14,53 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://abhashkhadka.com.np"),
-  title: {
-    default: "Abhash | Portfolio & Developer Blog",
-    template: "%s | Abhash",
-  },
-  description: "B.S. Information Technology Student - Building web apps, databases, and AI tools.",
-  keywords: ["Abhash", "Portfolio", "Web Developer", "Software Engineer", "Next.js", "React", "AI"],
-  authors: [{ name: "Abhash Khadka" }],
-  creator: "Abhash Khadka",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://abhashkhadka.com.np",
-    siteName: "Abhash Portfolio",
-    title: "Abhash | Portfolio & Developer Blog",
-    description: "B.S. Information Technology Student - Building web apps, databases, and AI tools.",
-    images: [
-      {
-        url: "/logo.png",
-        width: 1200,
-        height: 630,
-        alt: "Abhash Portfolio Logo",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Abhash | Portfolio & Developer Blog",
-    description: "B.S. Information Technology Student - Building web apps, databases, and AI tools.",
-    images: ["/logo.png"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getData();
+  const seo = data.seo;
+
+  const combinedTitle = [seo.title_en, seo.title_ja].filter(Boolean).join(" | ");
+  const combinedDescription = [seo.description_en, seo.description_ja].filter(Boolean).join(" ");
+  const combinedKeywords = [...(seo.keywords_en || "").split(","), ...(seo.keywords_ja || "").split(",")].map(k => k.trim()).filter(Boolean);
+
+  return {
+    metadataBase: new URL("https://abhashkhadka.com.np"),
+    title: {
+      default: combinedTitle || "Abhash Khadka",
+      template: "%s | Abhash Khadka",
+    },
+    description: combinedDescription,
+    keywords: combinedKeywords,
+    authors: [{ name: "Abhash Khadka" }],
+    creator: "Abhash Khadka",
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      alternateLocale: ["ja_JP"],
+      url: "https://abhashkhadka.com.np",
+      siteName: [seo.siteName_en, seo.siteName_ja].filter(Boolean).join(" | ") || "Abhash Khadka Portfolio",
+      title: combinedTitle || "Abhash Khadka",
+      description: combinedDescription,
+      images: [
+        {
+          url: "https://abhashkhadka.com.np/logo.png",
+          width: 1200,
+          height: 630,
+          alt: (seo.siteName_en || "Abhash Khadka Portfolio") + " Preview",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: combinedTitle || "Abhash Khadka",
+      description: combinedDescription,
+      images: ["https://abhashkhadka.com.np/logo.png"],
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 export const viewport = {
   themeColor: "#050505",

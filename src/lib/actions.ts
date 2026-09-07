@@ -489,3 +489,22 @@ export async function updatePopupContent(formData: FormData) {
   revalidatePath("/");
   redirect("/admin/popup?saved=1");
 }
+
+// ─── SEO ───────────────────────────────────────────────────────────────────
+
+export async function updateSeoContent(formData: FormData) {
+  const seo = {
+    siteName_en: (formData.get("siteName_en") as string) || "",
+    siteName_ja: (formData.get("siteName_ja") as string) || "",
+    title_en: (formData.get("title_en") as string) || "",
+    title_ja: (formData.get("title_ja") as string) || "",
+    description_en: (formData.get("description_en") as string) || "",
+    description_ja: (formData.get("description_ja") as string) || "",
+    keywords_en: (formData.get("keywords_en") as string) || "",
+    keywords_ja: (formData.get("keywords_ja") as string) || "",
+  };
+
+  await setDoc(doc(db, "site", "seo"), seo);
+  revalidatePath("/", "layout");
+  redirect("/admin/seo?saved=1");
+}

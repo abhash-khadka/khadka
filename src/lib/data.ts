@@ -133,6 +133,17 @@ export type PopupContent = {
   image: string;
 };
 
+export type SeoContent = {
+  siteName_en: string;
+  siteName_ja: string;
+  title_en: string;
+  title_ja: string;
+  description_en: string;
+  description_ja: string;
+  keywords_en: string;
+  keywords_ja: string;
+};
+
 export type SiteData = {
   landing: {
     en: LandingLanguageContent;
@@ -149,6 +160,7 @@ export type SiteData = {
   theme: ThemeColors;
   lightTheme: ThemeColors;
   popup: PopupContent;
+  seo: SeoContent;
 };
 
 export const defaultTheme: ThemeColors = {
@@ -239,6 +251,16 @@ export const getData = cache(async (): Promise<SiteData> => {
       buttonUrl: "",
       image: "",
     },
+    seo: {
+      siteName_en: "Abhash Khadka Portfolio",
+      siteName_ja: "アバッシュ ポートフォリオ",
+      title_en: "Abhash Khadka | Portfolio",
+      title_ja: "アバッシュ | ポートフォリオ",
+      description_en: "B.S. Information Technology Student. Building web apps, databases, and AI tools.",
+      description_ja: "Web開発者・ソフトウェアエンジニア。",
+      keywords_en: "Abhash, Portfolio, Web Developer, Software Engineer",
+      keywords_ja: "アバッシュ, ポートフォリオ, ウェブ開発者, ソフトウェアエンジニア",
+    },
   };
 
   try {
@@ -249,6 +271,7 @@ export const getData = cache(async (): Promise<SiteData> => {
       contactDoc,
       themeDoc,
       popupDoc,
+      seoDoc,
     ] = await Promise.all([
       getDoc(doc(db, "site", "landing")),
       getDocs(collection(db, "blogs")),
@@ -256,6 +279,7 @@ export const getData = cache(async (): Promise<SiteData> => {
       getDoc(doc(db, "site", "contact")),
       getDoc(doc(db, "site", "theme")),
       getDoc(doc(db, "site", "popup")),
+      getDoc(doc(db, "site", "seo")),
     ]);
 
     // Parse Landing
@@ -321,6 +345,11 @@ export const getData = cache(async (): Promise<SiteData> => {
     // Parse Popup
     if (popupDoc.exists()) {
       data.popup = { ...data.popup, ...popupDoc.data() } as PopupContent;
+    }
+
+    // Parse SEO
+    if (seoDoc.exists()) {
+      data.seo = { ...data.seo, ...seoDoc.data() } as SeoContent;
     }
   } catch (error) {
     console.error("Error fetching data from Firestore:", error);
