@@ -38,7 +38,7 @@ export type BlogPost = {
   date: string;
   image: string;
   published: boolean;
-  
+
   // Translated fields
   title_en: string;
   title_ja: string;
@@ -105,7 +105,7 @@ export type ContactContent = {
   sent_en: string;
   sentSubtitle_en: string;
   sendAnother_en: string;
-  
+
   location_ja: string;
   email_ja: string;
   tag_ja: string;
@@ -201,7 +201,7 @@ export const defaultContact: ContactContent = {
   sent_en: "Message Sent!",
   sentSubtitle_en: "Thanks for reaching out. I'll get back to you as soon as possible.",
   sendAnother_en: "← Send another message",
-  
+
   location_ja: "広島県、日本",
   email_ja: "info.abhashk@gmail.com",
   tag_ja: "お気軽にどうぞ",
@@ -253,13 +253,13 @@ export const getData = cache(async (): Promise<SiteData> => {
     },
     seo: {
       siteName_en: "Abhash Khadka Portfolio",
-      siteName_ja: "アバッシュ ポートフォリオ",
+      siteName_ja: "カドカアバシュ",
       title_en: "Abhash Khadka | Portfolio",
-      title_ja: "アバッシュ | ポートフォリオ",
+      title_ja: "アバシュ",
       description_en: "B.S. Information Technology Student. Building web apps, databases, and AI tools.",
       description_ja: "Web開発者・ソフトウェアエンジニア。",
       keywords_en: "Abhash, Portfolio, Web Developer, Software Engineer",
-      keywords_ja: "アバッシュ, ポートフォリオ, ウェブ開発者, ソフトウェアエンジニア",
+      keywords_ja: "アバシュ, ポートフォリオ, ウェブ開発者, ソフトウェアエンジニア、アバッシュ,あばしゅ",
     },
   };
 

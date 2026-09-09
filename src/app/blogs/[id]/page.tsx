@@ -15,23 +15,38 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 
   const title = post.title_en || "Blog Post";
-  const excerpt = post.excerpt_en || "";
-  const canonicalUrl = `/blogs/${post.slug || post.id}`;
+  const excerpt = post.excerpt_en || title;
+  const slug = post.slug || post.id;
+  const canonicalUrl = `/blogs/${slug}`;
+  const fullUrl = `https://abhashkhadka.com.np/blogs/${slug}`;
   const defaultImage = "https://abhashkhadka.com.np/logo.png";
   const ogImage = post.image || defaultImage;
+
+  // Safely parse the date — if it's not a valid ISO string, use current date
+  const parsedDate = new Date(post.date);
+  const publishedTime = isNaN(parsedDate.getTime()) ? undefined : parsedDate.toISOString();
 
   return {
     title,
     description: excerpt,
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        "en": fullUrl,
+        "ja": fullUrl,
+        "x-default": fullUrl,
+      },
     },
     openGraph: {
       title,
       description: excerpt,
       type: "article",
-      publishedTime: post.date,
-      images: [{ url: ogImage }],
+      url: fullUrl,
+      siteName: "Abhash Khadka Portfolio",
+      locale: "en_US",
+      alternateLocale: ["ja_JP"],
+      publishedTime,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
@@ -54,16 +69,25 @@ export default async function BlogPost({ params }: { params: Promise<{ id: strin
     notFound();
   }
 
+  // Safely parse the date for structured data
+  const blogDate = new Date(post.date);
+  const isoDate = isNaN(blogDate.getTime()) ? undefined : blogDate.toISOString();
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title_en || "Blog Post",
+    // Bilingual: provide Japanese headline as alternativeHeadline
+    ...(post.title_ja ? { alternativeHeadline: post.title_ja } : {}),
     description: post.excerpt_en || "",
+    inLanguage: ["en", "ja"],
     image: post.image ? [post.image] : ["https://abhashkhadka.com.np/logo.png"],
-    datePublished: post.date,
+    ...(isoDate ? { datePublished: isoDate } : {}),
+    url: `https://abhashkhadka.com.np/blogs/${post.slug || post.id}`,
     author: {
       "@type": "Person",
       name: "Abhash Khadka",
+      alternateName: "アバシュ・カドカ",
       url: "https://abhashkhadka.com.np/"
     }
   };

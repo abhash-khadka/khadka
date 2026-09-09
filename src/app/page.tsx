@@ -11,12 +11,17 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   alternates: {
     canonical: "/",
+    languages: {
+      "en": "https://abhashkhadka.com.np",
+      "ja": "https://abhashkhadka.com.np",
+      "x-default": "https://abhashkhadka.com.np",
+    },
   },
 };
 
 export default async function Home() {
   const data = await getData();
-  
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -25,6 +30,8 @@ export default async function Home() {
         "@id": "https://abhashkhadka.com.np/#website",
         url: "https://abhashkhadka.com.np/",
         name: data.seo.siteName_en || "Abhash Khadka Portfolio",
+        // Declare that this site serves content in both English and Japanese
+        inLanguage: ["en", "ja"],
         description: data.seo.description_en || "B.S. Information Technology Student - Building web apps, databases, and AI tools.",
         publisher: {
           "@id": "https://abhashkhadka.com.np/#person"
@@ -34,6 +41,8 @@ export default async function Home() {
         "@type": "Person",
         "@id": "https://abhashkhadka.com.np/#person",
         name: "Abhash Khadka",
+        // Japanese name variant for Japanese search engines
+        alternateName: "アバシュ・カドカ",
         url: "https://abhashkhadka.com.np/",
         jobTitle: "Web Developer",
         alumniOf: "Information Technology Student"

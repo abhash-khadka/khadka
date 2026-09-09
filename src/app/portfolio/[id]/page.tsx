@@ -15,9 +15,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const title = project.title_en || "Portfolio Project";
   const overview = project.overview_en || "";
 
-  // Strip HTML from overview for description
-  const cleanDescription = overview.replace(/<[^>]+>/g, '').substring(0, 160) + "...";
+  // Strip HTML from overview for description, guard against empty strings
+  const stripped = overview.replace(/<[^>]+>/g, '').trim().substring(0, 157);
+  const cleanDescription = stripped ? stripped + "..." : title;
   const canonicalUrl = `/portfolio/${project.id}`;
+  const fullUrl = `https://abhashkhadka.com.np/portfolio/${project.id}`;
   const defaultImage = "https://abhashkhadka.com.np/logo.png";
   const ogImage = project.image || defaultImage;
 
@@ -26,12 +28,21 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     description: cleanDescription,
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        "en": fullUrl,
+        "ja": fullUrl,
+        "x-default": fullUrl,
+      },
     },
     openGraph: {
       title,
       description: cleanDescription,
       type: "article",
-      images: [{ url: ogImage }],
+      url: fullUrl,
+      siteName: "Abhash Khadka Portfolio",
+      locale: "en_US",
+      alternateLocale: ["ja_JP"],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
@@ -55,11 +66,15 @@ export default async function PortfolioProject({ params }: { params: Promise<{ i
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     name: project.title_en || "Portfolio Project",
+    // Bilingual: provide Japanese project name
+    ...(project.title_ja ? { alternateName: project.title_ja } : {}),
     description: project.overview_en ? project.overview_en.replace(/<[^>]+>/g, '') : "",
+    inLanguage: ["en", "ja"],
     image: project.image ? [project.image] : ["https://abhashkhadka.com.np/logo.png"],
     author: {
       "@type": "Person",
       name: "Abhash Khadka",
+      alternateName: "アバシュ・カドカ",
       url: "https://abhashkhadka.com.np/"
     },
     url: `https://abhashkhadka.com.np/portfolio/${project.id}`
