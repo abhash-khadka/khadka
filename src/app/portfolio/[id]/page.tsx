@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getData } from "@/lib/data";
+import { getData, getApprovedComments } from "@/lib/data";
 import { Metadata } from "next";
 import PortfolioClient from "./PortfolioClient";
 
@@ -62,6 +62,8 @@ export default async function PortfolioProject({ params }: { params: Promise<{ i
     notFound();
   }
 
+  const comments = await getApprovedComments(project.id.toString());
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
@@ -86,7 +88,7 @@ export default async function PortfolioProject({ params }: { params: Promise<{ i
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <PortfolioClient project={project} />
+      <PortfolioClient project={project} comments={comments} />
     </>
   );
 }

@@ -73,6 +73,7 @@ export type PortfolioItem = {
   title_ja: string;
   overview_en: string;
   overview_ja: string;
+  likes?: number;
 };
 
 export type Message = {

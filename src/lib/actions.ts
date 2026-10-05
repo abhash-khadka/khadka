@@ -148,20 +148,21 @@ export async function deleteBlogPost(id: number, slug?: string) {
   revalidatePath("/blogs");
 }
 
-// ─── BLOG INTERACTIONS ────────────────────────────────────────────────────────
+// ─── INTERACTIONS ────────────────────────────────────────────────────────
 
-export async function incrementLike(slug: string) {
+export async function incrementLike(idOrSlug: string, type: 'blog' | 'portfolio' = 'blog') {
   try {
-    await updateDoc(doc(db, "blogs", slug), {
+    const collectionName = type === 'portfolio' ? 'portfolio' : 'blogs';
+    await updateDoc(doc(db, collectionName, idOrSlug), {
       likes: increment(1)
     });
-    revalidatePath(`/blogs/${slug}`);
+    revalidatePath(`/${collectionName}/${idOrSlug}`);
   } catch (error) {
     console.error("Error incrementing like:", error);
   }
 }
 
-export async function addComment(slug: string, formData: FormData) {
+export async function addComment(idOrSlug: string, formData: FormData, type: 'blog' | 'portfolio' = 'blog') {
   const id = Date.now();
   const name = formData.get("name") as string;
   const content = formData.get("content") as string;
@@ -171,7 +172,8 @@ export async function addComment(slug: string, formData: FormData) {
 
   const newComment: any = {
     id,
-    blogSlug: slug,
+    blogSlug: idOrSlug, // For backwards compatibility, keep naming or just use it as itemId
+    type,               // Store type to distinguish if needed
     name,
     content,
     date: new Date().toLocaleString("en-US", {
@@ -187,7 +189,8 @@ export async function addComment(slug: string, formData: FormData) {
 
   try {
     await setDoc(doc(db, "comments", id.toString()), newComment);
-    revalidatePath(`/blogs/${slug}`);
+    const collectionName = type === 'portfolio' ? 'portfolio' : 'blogs';
+    revalidatePath(`/${collectionName}/${idOrSlug}`);
     return { success: true };
   } catch (error) {
     console.error("Error adding comment:", error);
@@ -198,17 +201,22 @@ export async function addComment(slug: string, formData: FormData) {
 export async function approveComment(id: number) {
   await updateDoc(doc(db, "comments", id.toString()), { approved: true });
   revalidatePath("/admin/comments");
-  // We'd ideally revalidate the specific blog post path, but we don't have the slug here unless we pass it.
-  // We can just revalidate all blogs or the specific one if we know it.
   revalidatePath("/blogs"); 
-  revalidatePath("/", "layout"); // Overkill but ensures it updates.
+  revalidatePath("/portfolio", "layout");
+  revalidatePath("/", "layout"); 
 }
 
 export async function deleteComment(id: number) {
-  await deleteDoc(doc(db, "comments", id.toString()));
-  revalidatePath("/admin/comments");
-  revalidatePath("/blogs");
-  revalidatePath("/", "layout");
+  try {
+    await deleteDoc(doc(db, "comments", id.toString()));
+    revalidatePath("/admin/comments");
+    revalidatePath("/blogs");
+    revalidatePath("/portfolio", "layout");
+    revalidatePath("/", "layout");
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw error;
+  }
 }
 
 // ─── PORTFOLIO ───────────────────────────────────────────────────────────────

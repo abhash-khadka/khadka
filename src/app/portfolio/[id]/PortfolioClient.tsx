@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { PortfolioItem } from "@/lib/data";
+import { PortfolioItem, BlogComment } from "@/lib/data";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ImageModal from "@/components/ImageModal";
+import BlogInteractions from "@/components/BlogInteractions";
 
-export default function PortfolioClient({ project }: { project: PortfolioItem }) {
+export default function PortfolioClient({ project, comments }: { project: PortfolioItem, comments: BlogComment[] }) {
   const { lang, t } = useLanguage();
   const title = (project[`title_${lang}` as keyof PortfolioItem] as string) || project.title_en;
   const overview = (project[`overview_${lang}` as keyof PortfolioItem] as string) || project.overview_en;
@@ -100,7 +101,7 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
         </div>
 
         {/* Call to action */}
-        <div className="border rounded-2xl p-8 shadow-xl relative overflow-hidden mt-12" style={{ background: "var(--bg-secondary)", borderColor: "var(--border-color)" }}>
+        <div className="border rounded-2xl p-8 shadow-xl relative overflow-hidden mt-12 mb-16" style={{ background: "var(--bg-secondary)", borderColor: "var(--border-color)" }}>
           <div className="absolute top-0 right-0 p-6 opacity-5 transform rotate-12 scale-150" style={{ color: "var(--text-primary)" }}>
             <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2z"/></svg>
           </div>
@@ -113,6 +114,14 @@ export default function PortfolioClient({ project }: { project: PortfolioItem })
             <span className="text-lg leading-none">→</span>
           </Link>
         </div>
+
+        {/* Interactions (Likes & Comments) */}
+        <BlogInteractions 
+          slug={project.id.toString()} 
+          initialLikes={project.likes || 0} 
+          comments={comments} 
+          type="portfolio" 
+        />
 
       </div>
     </main>

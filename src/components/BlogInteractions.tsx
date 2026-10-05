@@ -8,11 +8,13 @@ import { incrementLike, addComment } from "@/lib/actions";
 export default function BlogInteractions({ 
   slug, 
   initialLikes, 
-  comments 
+  comments,
+  type = 'blog'
 }: { 
   slug: string; 
   initialLikes: number; 
-  comments: BlogComment[] 
+  comments: BlogComment[];
+  type?: 'blog' | 'portfolio';
 }) {
   const { t } = useLanguage();
   const [likes, setLikes] = useState(initialLikes || 0);
@@ -26,9 +28,9 @@ export default function BlogInteractions({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setHasLiked(localStorage.getItem(`liked_${slug}`) === "true");
+      setHasLiked(localStorage.getItem(`liked_${type}_${slug}`) === "true");
     }
-  }, [slug]);
+  }, [slug, type]);
 
   const handleLike = () => {
     if (hasLiked || isPendingLike) return;
@@ -36,11 +38,11 @@ export default function BlogInteractions({
     setLikes(prev => prev + 1);
     setHasLiked(true);
     if (typeof window !== "undefined") {
-      localStorage.setItem(`liked_${slug}`, "true");
+      localStorage.setItem(`liked_${type}_${slug}`, "true");
     }
 
     startLikeTransition(async () => {
-      await incrementLike(slug);
+      await incrementLike(slug, type);
     });
   };
 
@@ -63,7 +65,7 @@ export default function BlogInteractions({
 
   const submitComment = async (formData: FormData) => {
     startCommentTransition(async () => {
-      const result = await addComment(slug, formData);
+      const result = await addComment(slug, formData, type);
       if (result.success) {
         setCommentStatus("pendingApproval");
         setReplyingTo(null);
