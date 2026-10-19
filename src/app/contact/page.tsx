@@ -35,10 +35,10 @@ export default async function ContactPage() {
   const data = await getData();
   
   return (
-    <main className="pt-24 min-h-screen flex items-center bg-background">
+    <div className="pt-24 min-h-screen flex items-center bg-background">
       <div className="w-full">
         <Contact data={data.contact} />
       </div>
-    </main>
+    </div>
   );
 }

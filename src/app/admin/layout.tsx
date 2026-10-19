@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { checkAuth } from "@/lib/actions";
-import { getMessages, getAllComments } from "@/lib/data";
+import { getAdminBadgeCounts } from "@/lib/data";
 import AdminSidebar from "./AdminSidebar";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -9,14 +9,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/admin/login");
   }
 
-  // Fetch badge counts server-side
-  const [messages, comments] = await Promise.all([
-    getMessages(),
-    getAllComments(),
-  ]);
-
-  const unreadMessages = messages.filter((m) => !m.read).length;
-  const pendingComments = comments.filter((c) => !c.approved).length;
+  // Fetch badge counts server-side (aggregated server-side in Firestore)
+  const { unreadMessages, pendingComments } = await getAdminBadgeCounts();
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#0a0a0a]">

@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Serwist build artifact (regenerated on `next build`):
+    "public/sw.js",
+    "public/swe-worker*.js",
+    ".opencode/**",
   ]),
 ]);
 

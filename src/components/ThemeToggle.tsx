@@ -7,6 +7,9 @@ export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Hydration guard: localStorage is only readable after mount, and reading
+    // it during the first client render would mismatch the server HTML.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "light") {

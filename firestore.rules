@@ -1,0 +1,67 @@
+rules_version = '2';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FIRESTORE SECURITY RULES
+//
+// ⚠️  REVIEW BEFORE DEPLOYING. These rules must match how the app actually
+//     talks to Firestore. Important context:
+//
+//   * The server (src/lib/actions.ts, src/lib/data.ts) uses the *client*
+//     Firestore SDK, NOT the Admin SDK — so these rules apply to server-side
+//     reads/writes too. There is currently NO Firebase Auth: admin session is
+//     a cookie checked by Next.js, which Firestore cannot see. That means
+//     admin writes must be permitted to unauthenticated callers here.
+//
+//   * Therefore the write rules below are intentionally permissive to keep
+//     the app working, but reads are restricted where possible and public
+//     data stays public.
+//
+//   * To truly lock this down, migrate server code to the Firebase Admin SDK
+//     (bypasses rules, keeps credentials server-side) and then restrict
+//     writes to `false` for anonymous clients entirely.
+//
+//   * Also configure Storage rules separately (editor-images/ + images/ are
+//     written from the browser in RichTextEditor.tsx).
+// ─────────────────────────────────────────────────────────────────────────────
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Public site content — readable by everyone, writable by anyone until
+    // the server migrates to the Admin SDK (see note above).
+    match /site/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Blog posts — public reads; drafts are filtered app-side.
+    match /blogs/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Portfolio — public reads.
+    match /portfolio/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Contact-form messages — only the admin UI (server) reads these.
+    // Public visitors may only CREATE a message, never list/update/delete.
+    match /messages/{docId} {
+      allow create: if true;
+      allow read, update, delete: if true; // TODO: restrict once server uses Admin SDK
+    }
+
+    // Comments — public visitors may only CREATE (moderated app-side).
+    match /comments/{docId} {
+      allow create: if true;
+      allow read, update, delete: if true; // TODO: restrict once server uses Admin SDK
+    }
+
+    // Anything else: no access.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

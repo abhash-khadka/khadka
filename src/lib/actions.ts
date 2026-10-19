@@ -1,26 +1,65 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { BlogPost, PortfolioItem } from "@/lib/data";
-import { cookies } from "next/headers";
+import { BlogComment, BlogPost, PortfolioItem } from "@/lib/data";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db, storage } from "./firebase";
-import { doc, setDoc, updateDoc, deleteDoc, increment } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  increment,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateSlug, slidingWindowHit } from "./utils";
+import {
+  getEffectiveAiConfig,
+  getAiConfigSummary,
+  isQuotaOrRateLimitError,
+  DEFAULT_PRIMARY_MODEL,
+  DEFAULT_FALLBACK_MODELS,
+  type AiConfigSummary,
+} from "./ai";
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "000Nepal";
 const SESSION_COOKIE = "admin_session";
+
+// Password comes ONLY from the environment. A development-only default keeps
+// local `next dev` usable; in production an unset password fails closed
+// (login is impossible) instead of exposing a hardcoded credential.
+const ADMIN_PASSWORD =
+  process.env.ADMIN_PASSWORD ??
+  (process.env.NODE_ENV !== "production" ? "000Nepal" : undefined);
 
 // ─── AUTH ────────────────────────────────────────────────────────────────────
 
+/**
+ * Server-side guard for every mutation action. Page layouts only protect the
+ * HTML pages; server actions are standalone endpoints and must check the
+ * session cookie themselves.
+ */
+export async function requireAuth(): Promise<void> {
+  const cookieStore = await cookies();
+  if (cookieStore.get(SESSION_COOKIE)?.value !== "authenticated") {
+    redirect("/admin/login");
+  }
+}
+
 export async function loginAction(formData: FormData) {
   const password = formData.get("password") as string;
-  if (password === ADMIN_PASSWORD) {
+  if (ADMIN_PASSWORD && password === ADMIN_PASSWORD) {
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE, "authenticated", {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       maxAge: 60 * 60 * 24, // 24 hours
       path: "/",
     });
@@ -41,10 +80,27 @@ export async function checkAuth() {
   return session?.value === "authenticated";
 }
 
+// ─── RATE LIMITING ───────────────────────────────────────────────────────────
+// Simple in-memory sliding-window limiter for the public actions. Note: this
+// is per-process, so on serverless hosts it is best-effort (resets on cold
+// start). For strict limits, back this with Redis or a WAF.
+
+const rateBuckets = new Map<string, number[]>();
+
+async function rateLimit(action: string, max: number, windowMs: number): Promise<boolean> {
+  try {
+    const hdrs = await headers();
+    const ip = (hdrs.get("x-forwarded-for") ?? "").split(",")[0]?.trim() || "unknown";
+    return slidingWindowHit(rateBuckets, `${action}:${ip}`, Date.now(), max, windowMs);
+  } catch {
+    return true; // fail open if headers are unavailable
+  }
+}
+
 // ─── UTILS ────────────────────────────────────────────────────────────────────
 
-async function uploadImage(file: any): Promise<string | null> {
-  if (!file || typeof file === 'string' || !file.name || file.size === 0 || typeof file.arrayBuffer !== 'function') {
+async function uploadImage(file: File | null): Promise<string | null> {
+  if (!file || !file.name || file.size === 0 || typeof file.arrayBuffer !== "function") {
     return null;
   }
   try {
@@ -67,25 +123,21 @@ async function uploadImage(file: any): Promise<string | null> {
   }
 }
 
-function generateSlug(title: string, fallbackId: number): string {
-  const slug = title
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")   // remove special chars
-    .replace(/\s+/g, "-")            // spaces to hyphens
-    .replace(/-+/g, "-")             // collapse multiple hyphens
-    .replace(/^-+|-+$/g, "")         // trim leading/trailing hyphens
-    .substring(0, 80);               // max 80 chars
-  // Always return a non-empty string — fall back to timestamp if title is empty/symbols-only
-  return slug || fallbackId.toString();
-}
-
 // ─── BLOG ─────────────────────────────────────────────────────────────────────
 
 export async function createBlogPost(formData: FormData) {
+  await requireAuth();
   const id = Date.now();
   const title_en = formData.get("title_en") as string;
-  const slug = generateSlug(title_en, id);
+
+  // Generate a unique slug — setDoc(doc(db, "blogs", slug)) would otherwise
+  // silently overwrite an existing post with the same title.
+  const baseSlug = generateSlug(title_en, id);
+  let slug = baseSlug;
+  for (let n = 2; (await getDoc(doc(db, "blogs", slug))).exists(); n++) {
+    slug = `${baseSlug}-${n}`;
+  }
+
   const newPost: BlogPost = {
     id,
     slug,
@@ -108,9 +160,18 @@ export async function createBlogPost(formData: FormData) {
 }
 
 export async function updateBlogPost(id: number, formData: FormData) {
+  await requireAuth();
   const title_en = formData.get("title_en") as string;
-  const slug = generateSlug(title_en, id);
   const existingSlug = formData.get("existingSlug") as string;
+  const oldDocId = existingSlug || id.toString();
+
+  // Generate a unique slug that doesn't collide with a *different* post
+  const baseSlug = generateSlug(title_en, id);
+  let slug = baseSlug;
+  for (let n = 2; (await getDoc(doc(db, "blogs", slug))).exists() && slug !== oldDocId && n < 100; n++) {
+    slug = `${baseSlug}-${n}`;
+  }
+
   const updatedData = {
     title_en,
     title_ja: formData.get("title_ja") as string,
@@ -124,10 +185,15 @@ export async function updateBlogPost(id: number, formData: FormData) {
     published: formData.get("published") === "true",
   };
 
-  const oldDocId = existingSlug || id.toString();
-
   // If the document ID (slug or old numeric ID) changed, delete old and create new
   if (oldDocId !== slug) {
+    // Migrate comments to the new slug so existing discussions aren't orphaned
+    try {
+      const commentSnap = await getDocs(query(collection(db, "comments"), where("blogSlug", "==", oldDocId)));
+      await Promise.all(commentSnap.docs.map((d) => updateDoc(d.ref, { blogSlug: slug })));
+    } catch (error) {
+      console.error("Error migrating comments to new slug:", error);
+    }
     await deleteDoc(doc(db, "blogs", oldDocId));
     await setDoc(doc(db, "blogs", slug), { id, ...updatedData });
   } else {
@@ -142,7 +208,17 @@ export async function updateBlogPost(id: number, formData: FormData) {
 }
 
 export async function deleteBlogPost(id: number, slug?: string) {
-  await deleteDoc(doc(db, "blogs", slug || id.toString()));
+  await requireAuth();
+  const docId = slug || id.toString();
+  await deleteDoc(doc(db, "blogs", docId));
+
+  // Cascade-delete comments so they can't resurface if the slug is reused
+  try {
+    const commentSnap = await getDocs(query(collection(db, "comments"), where("blogSlug", "==", docId)));
+    await Promise.all(commentSnap.docs.map((d) => deleteDoc(d.ref)));
+  } catch (error) {
+    console.error("Error deleting comments for post:", error);
+  }
 
   revalidatePath("/");
   revalidatePath("/blogs");
@@ -151,6 +227,7 @@ export async function deleteBlogPost(id: number, slug?: string) {
 // ─── INTERACTIONS ────────────────────────────────────────────────────────
 
 export async function incrementLike(idOrSlug: string, type: 'blog' | 'portfolio' = 'blog') {
+  if (!(await rateLimit("like", 30, 60_000))) return; // max 30 likes/min per IP
   try {
     const collectionName = type === 'portfolio' ? 'portfolio' : 'blogs';
     await updateDoc(doc(db, collectionName, idOrSlug), {
@@ -163,14 +240,18 @@ export async function incrementLike(idOrSlug: string, type: 'blog' | 'portfolio'
 }
 
 export async function addComment(idOrSlug: string, formData: FormData, type: 'blog' | 'portfolio' = 'blog') {
+  if (!(await rateLimit("comment", 5, 10 * 60_000))) {
+    return { success: false, error: "Too many comments — please try again later." };
+  }
+
   const id = Date.now();
-  const name = formData.get("name") as string;
-  const content = formData.get("content") as string;
+  const name = String(formData.get("name") ?? "").trim().slice(0, 100);
+  const content = String(formData.get("content") ?? "").trim().slice(0, 2000);
   const parentIdStr = formData.get("parentId") as string;
   
   if (!name || !content) return { success: false, error: "Missing fields" };
 
-  const newComment: any = {
+  const newComment: BlogComment = {
     id,
     blogSlug: idOrSlug, // For backwards compatibility, keep naming or just use it as itemId
     type,               // Store type to distinguish if needed
@@ -199,6 +280,7 @@ export async function addComment(idOrSlug: string, formData: FormData, type: 'bl
 }
 
 export async function approveComment(id: number) {
+  await requireAuth();
   await updateDoc(doc(db, "comments", id.toString()), { approved: true });
   revalidatePath("/admin/comments");
   revalidatePath("/blogs"); 
@@ -207,6 +289,7 @@ export async function approveComment(id: number) {
 }
 
 export async function deleteComment(id: number) {
+  await requireAuth();
   try {
     await deleteDoc(doc(db, "comments", id.toString()));
     revalidatePath("/admin/comments");
@@ -222,6 +305,7 @@ export async function deleteComment(id: number) {
 // ─── PORTFOLIO ───────────────────────────────────────────────────────────────
 
 export async function createPortfolioItem(formData: FormData) {
+  await requireAuth();
   const id = Date.now();
   const techString = formData.get("technologies") as string;
   const newItem: PortfolioItem = {
@@ -245,6 +329,7 @@ export async function createPortfolioItem(formData: FormData) {
 }
 
 export async function updatePortfolioItem(id: number, formData: FormData) {
+  await requireAuth();
   const techString = formData.get("technologies") as string;
   const updatedData = {
     title_en: formData.get("title_en") as string,
@@ -267,6 +352,7 @@ export async function updatePortfolioItem(id: number, formData: FormData) {
 }
 
 export async function deletePortfolioItem(id: number) {
+  await requireAuth();
   await deleteDoc(doc(db, "portfolio", id.toString()));
 
   revalidatePath("/");
@@ -276,6 +362,7 @@ export async function deletePortfolioItem(id: number) {
 // ─── LANDING ─────────────────────────────────────────────────────────────────
 
 export async function updateLandingContent(formData: FormData) {
+  await requireAuth();
   const getLangData = (suffix: string) => ({
     hero: {
       tagline: formData.get(`tagline${suffix}`) as string,
@@ -314,13 +401,16 @@ export async function updateLandingContent(formData: FormData) {
 // ─── MESSAGES ─────────────────────────────────────────────────────────────────
 
 export async function sendMessage(formData: FormData) {
+  if (!(await rateLimit("message", 5, 10 * 60_000))) {
+    redirect("/contact?error=1");
+  }
   const id = Date.now();
   const newMessage = {
     id,
-    name: formData.get("name") as string,
-    email: formData.get("email") as string,
-    subject: formData.get("subject") as string,
-    message: formData.get("message") as string,
+    name: String(formData.get("name") ?? "").trim().slice(0, 100),
+    email: String(formData.get("email") ?? "").trim().slice(0, 200),
+    subject: String(formData.get("subject") ?? "").trim().slice(0, 200),
+    message: String(formData.get("message") ?? "").trim().slice(0, 5000),
     date: new Date().toLocaleString("en-US", {
       month: "short", day: "numeric", year: "numeric",
       hour: "2-digit", minute: "2-digit",
@@ -335,16 +425,19 @@ export async function sendMessage(formData: FormData) {
 }
 
 export async function markMessageRead(id: number) {
+  await requireAuth();
   await updateDoc(doc(db, "messages", id.toString()), { read: true });
   revalidatePath("/admin/messages");
 }
 
 export async function deleteMessage(id: number) {
+  await requireAuth();
   await deleteDoc(doc(db, "messages", id.toString()));
   revalidatePath("/admin/messages");
 }
 
 export async function markMessageReplied(id: number) {
+  await requireAuth();
   await updateDoc(doc(db, "messages", id.toString()), { replied: true, read: true });
   revalidatePath("/admin/messages");
 }
@@ -352,6 +445,7 @@ export async function markMessageReplied(id: number) {
 // ─── THEME ───────────────────────────────────────────────────────────────────
 
 export async function updateThemeColors(formData: FormData): Promise<{ success: boolean }> {
+  await requireAuth();
   const theme = {
     dark: {
       bgPrimary: formData.get("dark_bgPrimary") as string,
@@ -385,31 +479,31 @@ export async function updateThemeColors(formData: FormData): Promise<{ success: 
   return { success: true };
 }
 
-// ─── TRANSLATION (Google AI Studio) ────────────────────────────────────────
-
-const GOOGLE_AI_STUDIO_API_KEY = process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || "";
-const GOOGLE_AI_STUDIO_MODEL = process.env.GOOGLE_AI_STUDIO_MODEL || "gemini-2.5-flash";
-const FALLBACK_GOOGLE_AI_STUDIO_MODELS = process.env.GOOGLE_AI_STUDIO_FALLBACK_MODELS ? process.env.GOOGLE_AI_STUDIO_FALLBACK_MODELS.split(",") : ["gemini-2.0-flash-lite", "gemini-2.0-flash"];
-
-function isQuotaOrRateLimitError(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-  return /429|quota|rate limit|free tier|too many requests/i.test(message);
-}
+// ─── TRANSLATION (Google AI Studio / Gemini) ───────────────────────────────
 
 async function generateTranslationWithModel(apiKey: string, prompt: string, modelName: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: modelName });
+  const model = genAI.getGenerativeModel({
+    model: modelName,
+    systemInstruction:
+      "You are a professional translator. Translate the text accurately and naturally. Do not include quotes, markdown bold, notes, conversational filler, or explanations. Output ONLY the raw translated text.",
+  });
   const result = await model.generateContent(prompt);
   const response = await result.response;
   return String(response.text()).trim();
 }
 
 export async function translateText(text: string, sourceLanguage: string, targetLanguage: string) {
+  await requireAuth(); // admin-only — prevents quota abuse by anonymous callers
   if (!text) return "";
-  if (!GOOGLE_AI_STUDIO_API_KEY) {
-    console.error("GOOGLE_AI_STUDIO_API_KEY is not set.");
-    return "Error: GOOGLE_AI_STUDIO_API_KEY is not set.";
+
+  const { apiKey, primaryModel, fallbackModels } = await getEffectiveAiConfig();
+
+  if (!apiKey) {
+    console.error("AI API Key is not configured (neither in Admin Dashboard nor in environment variables).");
+    return "Error: AI API Key is not configured. Please configure it in Admin > AI Settings or set GOOGLE_AI_STUDIO_API_KEY.";
   }
+
   try {
     const prompt = `Translate the following text from ${sourceLanguage} to ${targetLanguage}. Only return the translated text, without any additional explanation or formatting.
 
@@ -417,17 +511,16 @@ Text to translate:
 "${text}"
 `;
 
-    const modelsToTry = [GOOGLE_AI_STUDIO_MODEL, ...FALLBACK_GOOGLE_AI_STUDIO_MODELS.filter((model) => model !== GOOGLE_AI_STUDIO_MODEL)];
+    const modelsToTry = [primaryModel, ...fallbackModels.filter((model) => model !== primaryModel)];
 
     let lastError: unknown;
     for (const modelName of modelsToTry) {
       try {
-        return await generateTranslationWithModel(GOOGLE_AI_STUDIO_API_KEY, prompt, modelName);
+        return await generateTranslationWithModel(apiKey, prompt, modelName);
       } catch (error) {
         lastError = error;
-        if (!isQuotaOrRateLimitError(error)) {
-          throw error;
-        }
+        console.warn(`Translation attempt with model ${modelName} failed:`, error instanceof Error ? error.message : error);
+        // Continue to next model in the fallback chain (handles 429 quota, 503 high demand, 404 deprecated models)
       }
     }
 
@@ -439,7 +532,118 @@ Text to translate:
   }
 }
 
+export type TestAiResult = {
+  success: boolean;
+  translatedText?: string;
+  modelUsed?: string;
+  latencyMs?: number;
+  error?: string;
+};
+
+export async function testAiTranslationAction(params: {
+  text: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  customApiKey?: string;
+  customModel?: string;
+}): Promise<TestAiResult> {
+  await requireAuth();
+  const startTime = Date.now();
+  try {
+    const config = await getEffectiveAiConfig();
+    const apiKey = params.customApiKey?.trim() || config.apiKey;
+    const primaryModel = params.customModel?.trim() || config.primaryModel;
+
+    if (!apiKey) {
+      return {
+        success: false,
+        latencyMs: Date.now() - startTime,
+        error: "No API key found. Please enter a Google AI Studio API key.",
+      };
+    }
+
+    const prompt = `Translate the following text from ${params.sourceLanguage} to ${params.targetLanguage}. Only return the translated text:
+
+"${params.text}"
+`;
+
+    const modelsToTry = [primaryModel, ...config.fallbackModels.filter((m) => m !== primaryModel)];
+    let lastError: unknown;
+
+    for (const modelName of modelsToTry) {
+      try {
+        const translatedText = await generateTranslationWithModel(apiKey, prompt, modelName);
+        return {
+          success: true,
+          translatedText,
+          modelUsed: modelName,
+          latencyMs: Date.now() - startTime,
+        };
+      } catch (err) {
+        lastError = err;
+        console.warn(`Test translation failed on ${modelName}:`, err instanceof Error ? err.message : err);
+      }
+    }
+
+    throw lastError ?? new Error("Translation failed");
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      success: false,
+      latencyMs: Date.now() - startTime,
+      error: message,
+    };
+  }
+}
+
+export async function getAiSettingsAction(): Promise<AiConfigSummary> {
+  await requireAuth();
+  return await getAiConfigSummary();
+}
+
+export async function updateAiSettingsAction(formData: FormData) {
+  await requireAuth();
+
+  const primaryModel = (formData.get("primaryModel") as string)?.trim() || DEFAULT_PRIMARY_MODEL;
+  const customModel = (formData.get("customModel") as string)?.trim();
+  const effectivePrimaryModel = primaryModel === "custom" && customModel ? customModel : primaryModel;
+
+  const fallbackModelsRaw = (formData.get("fallbackModels") as string) || "";
+  const fallbackModels = fallbackModelsRaw
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean);
+
+  const clearCustomKey = formData.get("clearCustomKey") === "true";
+  const newApiKey = (formData.get("apiKey") as string)?.trim();
+
+  // Fetch current doc to preserve apiKey if not changed or cleared
+  const aiDocRef = doc(db, "site", "ai");
+  const snap = await getDoc(aiDocRef);
+  const existingData = snap.exists() ? snap.data() : {};
+
+  let finalApiKey: string = typeof existingData.apiKey === "string" ? existingData.apiKey : "";
+  if (clearCustomKey) {
+    finalApiKey = "";
+  } else if (newApiKey && !newApiKey.includes("••••")) {
+    finalApiKey = newApiKey;
+  }
+
+  const aiSettings = {
+    apiKey: finalApiKey,
+    primaryModel: effectivePrimaryModel,
+    fallbackModels: fallbackModels.length > 0 ? fallbackModels : DEFAULT_FALLBACK_MODELS,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await setDoc(aiDocRef, aiSettings);
+  revalidatePath("/admin/ai");
+  revalidatePath("/admin");
+  return { success: true };
+}
+
 export async function updateContactContent(formData: FormData) {
+  await requireAuth();
   const contact = {
     location_en: (formData.get("location_en") as string) || "",
     email_en:    (formData.get("email_en")    as string) || "",
@@ -478,6 +682,7 @@ export async function updateContactContent(formData: FormData) {
 // ─── POPUP ─────────────────────────────────────────────────────────────────
 
 export async function updatePopupContent(formData: FormData) {
+  await requireAuth();
   const imageFile = formData.get("image") as File | null;
   const uploadedImage = await uploadImage(imageFile);
 
@@ -501,6 +706,7 @@ export async function updatePopupContent(formData: FormData) {
 // ─── SEO ───────────────────────────────────────────────────────────────────
 
 export async function updateSeoContent(formData: FormData) {
+  await requireAuth();
   const seo = {
     siteName_en: (formData.get("siteName_en") as string) || "",
     siteName_ja: (formData.get("siteName_ja") as string) || "",

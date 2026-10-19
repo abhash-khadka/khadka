@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SiteData } from "@/lib/data";
 import { updateLandingContent, translateText } from "@/lib/actions";
@@ -11,43 +11,42 @@ import FieldWithButton, { SmallFieldWithButton } from "./FieldWithButton";
 export default function LandingForm({ data }: { data: SiteData["landing"] }) {
   const [tab, setTab] = useState<"en" | "ja">("en");
   const searchParams = useSearchParams();
-  const [showAlert, setShowAlert] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
-  useEffect(() => {
-    if (searchParams.get("saved") === "1") {
-      setShowAlert(true);
-    }
-  }, [searchParams]);
+  // Derived from the URL — no state/effect needed; dismissing clears ?saved=1.
+  const showAlert = searchParams.get("saved") === "1";
 
-  const [tagline_en, setTaglineEn] = useState("");
-  const [title_en, setTitleEn] = useState("");
-  const [subtitle_en, setSubtitleEn] = useState("");
-  const [ctaText_en, setCtaTextEn] = useState("");
-  const [aboutTag_en, setAboutTagEn] = useState("");
-  const [aboutTitle_en, setAboutTitleEn] = useState("");
-  const [bio1_en, setBio1En] = useState("");
-  const [bio2_en, setBio2En] = useState("");
-  const [bio3_en, setBio3En] = useState("");
-  const [gpa_en, setGpaEn] = useState("");
-  const [projectsCount_en, setProjectsCountEn] = useState("");
-  const [certs_en, setCertsEn] = useState("");
+  // Initialized lazily from props (data is available at mount)
+  const [tagline_en, setTaglineEn] = useState(() => data?.en?.hero?.tagline ?? "");
+  const [title_en, setTitleEn] = useState(() => data?.en?.hero?.title ?? "");
+  const [subtitle_en, setSubtitleEn] = useState(() => data?.en?.hero?.subtitle ?? "");
+  const [ctaText_en, setCtaTextEn] = useState(() => data?.en?.hero?.ctaText ?? "");
+  const [aboutTag_en, setAboutTagEn] = useState(() => data?.en?.about?.tag ?? "");
+  const [aboutTitle_en, setAboutTitleEn] = useState(() => data?.en?.about?.title ?? "");
+  const [bio1_en, setBio1En] = useState(() => data?.en?.about?.bio1 ?? "");
+  const [bio2_en, setBio2En] = useState(() => data?.en?.about?.bio2 ?? "");
+  const [bio3_en, setBio3En] = useState(() => data?.en?.about?.bio3 ?? "");
+  const [gpa_en, setGpaEn] = useState(() => data?.en?.about?.gpa ?? "");
+  const [projectsCount_en, setProjectsCountEn] = useState(() => data?.en?.about?.projects ?? "");
+  const [certs_en, setCertsEn] = useState(() => data?.en?.about?.certs ?? "");
 
-  const [tagline_ja, setTaglineJa] = useState("");
-  const [title_ja, setTitleJa] = useState("");
-  const [subtitle_ja, setSubtitleJa] = useState("");
-  const [ctaText_ja, setCtaTextJa] = useState("");
-  const [aboutTag_ja, setAboutTagJa] = useState("");
-  const [aboutTitle_ja, setAboutTitleJa] = useState("");
-  const [bio1_ja, setBio1Ja] = useState("");
-  const [bio2_ja, setBio2Ja] = useState("");
-  const [bio3_ja, setBio3Ja] = useState("");
-  const [gpa_ja, setGpaJa] = useState("");
-  const [projectsCount_ja, setProjectsCountJa] = useState("");
-  const [certs_ja, setCertsJa] = useState("");
+  const [tagline_ja, setTaglineJa] = useState(() => data?.ja?.hero?.tagline ?? "");
+  const [title_ja, setTitleJa] = useState(() => data?.ja?.hero?.title ?? "");
+  const [subtitle_ja, setSubtitleJa] = useState(() => data?.ja?.hero?.subtitle ?? "");
+  const [ctaText_ja, setCtaTextJa] = useState(() => data?.ja?.hero?.ctaText ?? "");
+  const [aboutTag_ja, setAboutTagJa] = useState(() => data?.ja?.about?.tag ?? "");
+  const [aboutTitle_ja, setAboutTitleJa] = useState(() => data?.ja?.about?.title ?? "");
+  const [bio1_ja, setBio1Ja] = useState(() => data?.ja?.about?.bio1 ?? "");
+  const [bio2_ja, setBio2Ja] = useState(() => data?.ja?.about?.bio2 ?? "");
+  const [bio3_ja, setBio3Ja] = useState(() => data?.ja?.about?.bio3 ?? "");
+  const [gpa_ja, setGpaJa] = useState(() => data?.ja?.about?.gpa ?? "");
+  const [projectsCount_ja, setProjectsCountJa] = useState(() => data?.ja?.about?.projects ?? "");
+  const [certs_ja, setCertsJa] = useState(() => data?.ja?.about?.certs ?? "");
 
-  const [heroBgUrl, setHeroBgUrl] = useState("");
-  const [aboutImgUrl, setAboutImgUrl] = useState("");
-  const [quoteBgUrl, setQuoteBgUrl] = useState("");
+  const [heroBgUrl, setHeroBgUrl] = useState(() => data?.images?.heroBg ?? "");
+  const [aboutImgUrl, setAboutImgUrl] = useState(() => data?.images?.aboutImg ?? "");
+  const [quoteBgUrl, setQuoteBgUrl] = useState(() => data?.images?.quoteBg ?? "");
   const [isTranslatingAll, setIsTranslatingAll] = useState(false);
 
   const handleTranslateAllToJa = async () => {
@@ -91,40 +90,6 @@ export default function LandingForm({ data }: { data: SiteData["landing"] }) {
       setIsTranslatingAll(false);
     }
   };
-
-  useEffect(() => {
-    if (data) {
-      setTaglineEn(data.en.hero.tagline ?? "");
-      setTitleEn(data.en.hero.title ?? "");
-      setSubtitleEn(data.en.hero.subtitle ?? "");
-      setCtaTextEn(data.en.hero.ctaText ?? "");
-      setAboutTagEn(data.en.about.tag ?? "");
-      setAboutTitleEn(data.en.about.title ?? "");
-      setBio1En(data.en.about.bio1 ?? "");
-      setBio2En(data.en.about.bio2 ?? "");
-      setBio3En(data.en.about.bio3 ?? "");
-      setGpaEn(data.en.about.gpa ?? "");
-      setProjectsCountEn(data.en.about.projects ?? "");
-      setCertsEn(data.en.about.certs ?? "");
-
-      setTaglineJa(data.ja.hero.tagline ?? "");
-      setTitleJa(data.ja.hero.title ?? "");
-      setSubtitleJa(data.ja.hero.subtitle ?? "");
-      setCtaTextJa(data.ja.hero.ctaText ?? "");
-      setAboutTagJa(data.ja.about.tag ?? "");
-      setAboutTitleJa(data.ja.about.title ?? "");
-      setBio1Ja(data.ja.about.bio1 ?? "");
-      setBio2Ja(data.ja.about.bio2 ?? "");
-      setBio3Ja(data.ja.about.bio3 ?? "");
-      setGpaJa(data.ja.about.gpa ?? "");
-      setProjectsCountJa(data.ja.about.projects ?? "");
-      setCertsJa(data.ja.about.certs ?? "");
-
-      setHeroBgUrl(data.images?.heroBg ?? "");
-      setAboutImgUrl(data.images?.aboutImg ?? "");
-      setQuoteBgUrl(data.images?.quoteBg ?? "");
-    }
-  }, [data]);
 
   const renderLanguageSection = (lang: "en" | "ja") => {
     const isVisible = tab === lang;
@@ -194,7 +159,7 @@ export default function LandingForm({ data }: { data: SiteData["landing"] }) {
       {showAlert && (
         <SaveAlert
           message="Landing page saved successfully!"
-          onDismiss={() => setShowAlert(false)}
+          onDismiss={() => router.replace(pathname)}
         />
       )}
       <form action={updateLandingContent} className="space-y-10">
@@ -202,7 +167,7 @@ export default function LandingForm({ data }: { data: SiteData["landing"] }) {
       <input type="hidden" name="title_en" value={title_en || ""} />
       <input type="hidden" name="subtitle_en" value={subtitle_en || ""} />
       <input type="hidden" name="ctaText_en" value={ctaText_en || ""} />
-      <input type="hidden" name="aboutTag_en" value={aboutTag_en || ""} />
+      <input type="hidden" name="tag_en" value={aboutTag_en || ""} />
       <input type="hidden" name="aboutTitle_en" value={aboutTitle_en || ""} />
       <input type="hidden" name="bio1_en" value={bio1_en || ""} />
       <input type="hidden" name="bio2_en" value={bio2_en || ""} />
@@ -214,7 +179,7 @@ export default function LandingForm({ data }: { data: SiteData["landing"] }) {
       <input type="hidden" name="title_ja" value={title_ja || ""} />
       <input type="hidden" name="subtitle_ja" value={subtitle_ja || ""} />
       <input type="hidden" name="ctaText_ja" value={ctaText_ja || ""} />
-      <input type="hidden" name="aboutTag_ja" value={aboutTag_ja || ""} />
+      <input type="hidden" name="tag_ja" value={aboutTag_ja || ""} />
       <input type="hidden" name="aboutTitle_ja" value={aboutTitle_ja || ""} />
       <input type="hidden" name="bio1_ja" value={bio1_ja || ""} />
       <input type="hidden" name="bio2_ja" value={bio2_ja || ""} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import RichTextEditor from "@/components/RichTextEditor";
 import { BlogPost } from "@/lib/data";
@@ -15,7 +15,7 @@ export default function BlogForm({
   isEdit = false 
 }: { 
   post?: BlogPost; 
-  action: any; // Using any for Server Action passing
+  action: ActionType;
   isEdit?: boolean;
 }) {
   const [tab, setTab] = useState<"en" | "ja">("en");
@@ -54,17 +54,7 @@ export default function BlogForm({
     }
   };
 
-  useEffect(() => {
-    if (post) {
-      setTitleEn(post.title_en);
-      setTitleJa(post.title_ja);
-      setExcerptEn(post.excerpt_en);
-      setExcerptJa(post.excerpt_ja);
-      setContentEn(post.content_en);
-      setContentJa(post.content_ja);
-      setDate(post.date);
-    }
-  }, [post]);
+  // Note: field state is initialized lazily from `post` above — no sync effect needed.
 
   const renderLanguageSection = (lang: "en" | "ja") => {
     const isVisible = tab === lang;

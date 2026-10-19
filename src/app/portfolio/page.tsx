@@ -34,8 +34,8 @@ export const metadata: Metadata = {
 export default async function PortfolioPage() {
   const data = await getData();
   return (
-    <main className="pt-24 min-h-screen">
+    <div className="pt-24 min-h-screen">
       <Portfolio projects={data.portfolio} />
-    </main>
+    </div>
   );
 }

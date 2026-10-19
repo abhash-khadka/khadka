@@ -8,9 +8,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const data = await getData();
   const post = data.blogs.find(
     (p) => p.slug === resolvedParams.id || p.id === parseInt(resolvedParams.id)
-  ) as any;
+  );
 
-  if (!post) {
+  // Drafts must never be indexed or reachable
+  if (!post || !post.published) {
     return { title: "Post Not Found" };
   }
 
@@ -63,9 +64,10 @@ export default async function BlogPost({ params }: { params: Promise<{ id: strin
   // Match by slug first, fall back to numeric id for old posts
   const post = data.blogs.find(
     (p) => p.slug === resolvedParams.id || p.id === parseInt(resolvedParams.id)
-  ) as any;
+  );
 
-  if (!post) {
+  // Drafts are only visible in the admin panel — 404 them for everyone else
+  if (!post || !post.published) {
     notFound();
   }
 

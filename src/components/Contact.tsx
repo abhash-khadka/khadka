@@ -9,6 +9,7 @@ import { ContactContent } from "@/lib/data";
 function ContactForm({ data }: { data?: ContactContent }) {
   const searchParams = useSearchParams();
   const sent = searchParams.get("sent") === "1";
+  const errored = searchParams.get("error") === "1";
   const { t, lang } = useLanguage();
   
   const tag = data ? (lang === "ja" ? data.tag_ja : data.tag_en) : t.contact.tag;
@@ -85,6 +86,18 @@ function ContactForm({ data }: { data?: ContactContent }) {
                 </a>
               </div>
             ) : (
+              <>
+              {errored && (
+                <div
+                  className="mb-6 p-4 text-sm text-center font-medium rounded-sm"
+                  style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.4)", color: "#f87171" }}
+                  role="alert"
+                >
+                  {lang === "ja"
+                    ? "送信できませんでした。しばらくしてからもう一度お試しください。"
+                    : "Your message could not be sent — please try again in a moment."}
+                </div>
+              )}
               <form action={sendMessage} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <input
@@ -128,6 +141,7 @@ function ContactForm({ data }: { data?: ContactContent }) {
                   {sendLabel}
                 </button>
               </form>
+              </>
             )}
           </div>
         </div>

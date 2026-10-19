@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ContactContent } from "@/lib/data";
 import { updateContactContent, translateText } from "@/lib/actions";
 import TranslateButton from "@/components/TranslateButton";
@@ -11,45 +11,43 @@ import FieldWithButton from "@/app/admin/landing/FieldWithButton";
 export default function ContactForm({ data }: { data: ContactContent }) {
   const [tab, setTab] = useState<"en" | "ja">("en");
   const searchParams = useSearchParams();
-  const [showAlert, setShowAlert] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
-  useEffect(() => {
-    if (searchParams.get("saved") === "1") {
-      setShowAlert(true);
-    }
-  }, [searchParams]);
+  // Derived from the URL — no state/effect needed; dismissing clears ?saved=1.
+  const showAlert = searchParams.get("saved") === "1";
 
-  // English Fields
-  const [location_en, setLocationEn] = useState("");
-  const [email_en, setEmailEn] = useState("");
+  // English Fields (initialized lazily from props)
+  const [location_en, setLocationEn] = useState(() => data?.location_en ?? "");
+  const [email_en, setEmailEn] = useState(() => data?.email_en ?? "");
   
   // Other English Fields
-  const [tag_en, setTagEn] = useState("");
-  const [title_en, setTitleEn] = useState("");
-  const [subtitle_en, setSubtitleEn] = useState("");
-  const [name_en, setNameEn] = useState("");
-  const [emailPlaceholder_en, setEmailPlaceholderEn] = useState("");
-  const [subject_en, setSubjectEn] = useState("");
-  const [message_en, setMessageEn] = useState("");
-  const [send_en, setSendEn] = useState("");
-  const [sent_en, setSentEn] = useState("");
-  const [sentSubtitle_en, setSentSubtitleEn] = useState("");
-  const [sendAnother_en, setSendAnotherEn] = useState("");
+  const [tag_en, setTagEn] = useState(() => data?.tag_en ?? "");
+  const [title_en, setTitleEn] = useState(() => data?.title_en ?? "");
+  const [subtitle_en, setSubtitleEn] = useState(() => data?.subtitle_en ?? "");
+  const [name_en, setNameEn] = useState(() => data?.name_en ?? "");
+  const [emailPlaceholder_en, setEmailPlaceholderEn] = useState(() => data?.emailPlaceholder_en ?? "");
+  const [subject_en, setSubjectEn] = useState(() => data?.subject_en ?? "");
+  const [message_en, setMessageEn] = useState(() => data?.message_en ?? "");
+  const [send_en, setSendEn] = useState(() => data?.send_en ?? "");
+  const [sent_en, setSentEn] = useState(() => data?.sent_en ?? "");
+  const [sentSubtitle_en, setSentSubtitleEn] = useState(() => data?.sentSubtitle_en ?? "");
+  const [sendAnother_en, setSendAnotherEn] = useState(() => data?.sendAnother_en ?? "");
 
   // Japanese Fields
-  const [location_ja, setLocationJa] = useState("");
-  const [email_ja, setEmailJa] = useState("");
-  const [tag_ja, setTagJa] = useState("");
-  const [title_ja, setTitleJa] = useState("");
-  const [subtitle_ja, setSubtitleJa] = useState("");
-  const [name_ja, setNameJa] = useState("");
-  const [emailPlaceholder_ja, setEmailPlaceholderJa] = useState("");
-  const [subject_ja, setSubjectJa] = useState("");
-  const [message_ja, setMessageJa] = useState("");
-  const [send_ja, setSendJa] = useState("");
-  const [sent_ja, setSentJa] = useState("");
-  const [sentSubtitle_ja, setSentSubtitleJa] = useState("");
-  const [sendAnother_ja, setSendAnotherJa] = useState("");
+  const [location_ja, setLocationJa] = useState(() => data?.location_ja ?? "");
+  const [email_ja, setEmailJa] = useState(() => data?.email_ja ?? "");
+  const [tag_ja, setTagJa] = useState(() => data?.tag_ja ?? "");
+  const [title_ja, setTitleJa] = useState(() => data?.title_ja ?? "");
+  const [subtitle_ja, setSubtitleJa] = useState(() => data?.subtitle_ja ?? "");
+  const [name_ja, setNameJa] = useState(() => data?.name_ja ?? "");
+  const [emailPlaceholder_ja, setEmailPlaceholderJa] = useState(() => data?.emailPlaceholder_ja ?? "");
+  const [subject_ja, setSubjectJa] = useState(() => data?.subject_ja ?? "");
+  const [message_ja, setMessageJa] = useState(() => data?.message_ja ?? "");
+  const [send_ja, setSendJa] = useState(() => data?.send_ja ?? "");
+  const [sent_ja, setSentJa] = useState(() => data?.sent_ja ?? "");
+  const [sentSubtitle_ja, setSentSubtitleJa] = useState(() => data?.sentSubtitle_ja ?? "");
+  const [sendAnother_ja, setSendAnotherJa] = useState(() => data?.sendAnother_ja ?? "");
   const [isTranslatingAll, setIsTranslatingAll] = useState(false);
 
   const handleTranslateAllToJa = async () => {
@@ -97,37 +95,6 @@ export default function ContactForm({ data }: { data: ContactContent }) {
       setIsTranslatingAll(false);
     }
   };
-  useEffect(() => {
-    if (data) {
-      setLocationEn(data.location_en ?? "");
-      setEmailEn(data.email_en ?? "");
-      setTagEn(data.tag_en ?? "");
-      setTitleEn(data.title_en ?? "");
-      setSubtitleEn(data.subtitle_en ?? "");
-      setNameEn(data.name_en ?? "");
-      setEmailPlaceholderEn(data.emailPlaceholder_en ?? "");
-      setSubjectEn(data.subject_en ?? "");
-      setMessageEn(data.message_en ?? "");
-      setSendEn(data.send_en ?? "");
-      setSentEn(data.sent_en ?? "");
-      setSentSubtitleEn(data.sentSubtitle_en ?? "");
-      setSendAnotherEn(data.sendAnother_en ?? "");
-      
-      setLocationJa(data.location_ja ?? "");
-      setEmailJa(data.email_ja ?? "");
-      setTagJa(data.tag_ja ?? "");
-      setTitleJa(data.title_ja ?? "");
-      setSubtitleJa(data.subtitle_ja ?? "");
-      setNameJa(data.name_ja ?? "");
-      setEmailPlaceholderJa(data.emailPlaceholder_ja ?? "");
-      setSubjectJa(data.subject_ja ?? "");
-      setMessageJa(data.message_ja ?? "");
-      setSendJa(data.send_ja ?? "");
-      setSentJa(data.sent_ja ?? "");
-      setSentSubtitleJa(data.sentSubtitle_ja ?? "");
-      setSendAnotherJa(data.sendAnother_ja ?? "");
-    }
-  }, [data]);
 
   const renderLanguageSection = (lang: "en" | "ja") => {
     const isVisible = tab === lang;
@@ -197,7 +164,7 @@ export default function ContactForm({ data }: { data: ContactContent }) {
   return (
     <>
       {showAlert && (
-        <SaveAlert message="Contact content saved successfully!" onDismiss={() => setShowAlert(false)} />
+        <SaveAlert message="Contact content saved successfully!" onDismiss={() => router.replace(pathname)} />
       )}
       <form action={updateContactContent} className="space-y-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-800 pb-6">

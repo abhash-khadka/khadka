@@ -29,6 +29,7 @@ This project is a modern, bilingual personal portfolio and blog website built wi
 
 ### 3. Admin Dashboard (`/admin`)
 - **Authentication:** Protected via cookie-based sessions and server-side password validation (`actions.ts`).
+- **AI & Translation Settings (`/admin/ai`):** Manage Gemini API keys, select primary models (e.g. Gemini 2.5 Flash, 2.5 Pro, 2.0 Flash) or custom models, configure failover models for quota/rate limits, and test translations interactively.
 - **Blog Management:** Full CRUD capabilities for blog posts utilizing a Tiptap-based rich text editor and Firebase Storage for image uploads.
 - **Portfolio Management:** Add, edit, and categorize portfolio items with technology tags and external links (Live/GitHub).
 - **Page Content Management:** Dynamically update Landing page (Hero, About, Images) and Contact page texts in both languages.
@@ -36,6 +37,7 @@ This project is a modern, bilingual personal portfolio and blog website built wi
 
 ### 4. AI-Powered Translations
 - Implements a server action `translateText` utilizing Google Generative AI (Gemini) to automatically assist the admin in translating content between English and Japanese.
+- Resolves configuration dynamically via `getEffectiveAiConfig()` from Firestore (`site/ai`) with seamless fallback to environment variables (`GOOGLE_AI_STUDIO_API_KEY`, `GOOGLE_AI_STUDIO_MODEL`).
 
 ### 5. Server Actions & Firebase
 - Employs Next.js Server Actions (`src/lib/actions.ts`) for all server-side mutations, providing a seamless, API-route-free developer experience.

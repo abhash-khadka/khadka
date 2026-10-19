@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, setDoc, query, where, getCountFromServer } from "firebase/firestore";
 import { cache } from "react";
 
 export type ThemeColors = {
@@ -57,6 +57,7 @@ export type BlogComment = {
   date: string;
   approved: boolean;
   parentId?: number;
+  type?: "blog" | "portfolio";
 };
 
 
@@ -376,12 +377,16 @@ export const getMessages = cache(async (): Promise<Message[]> => {
 export const getApprovedComments = cache(async (slug: string): Promise<BlogComment[]> => {
   const comments: BlogComment[] = [];
   try {
-    const commentsSnapshot = await getDocs(collection(db, "comments"));
+    // Query only the matching comments instead of scanning the whole collection
+    const commentsSnapshot = await getDocs(
+      query(
+        collection(db, "comments"),
+        where("blogSlug", "==", slug),
+        where("approved", "==", true)
+      )
+    );
     commentsSnapshot.forEach((doc) => {
-      const c = doc.data() as BlogComment;
-      if (c.blogSlug === slug && c.approved) {
-        comments.push(c);
-      }
+      comments.push(doc.data() as BlogComment);
     });
     // Sort by id (timestamp) ascending so oldest are first
     comments.sort((a, b) => a.id - b.id);
@@ -405,3 +410,26 @@ export const getAllComments = cache(async (): Promise<BlogComment[]> => {
   }
   return comments;
 });
+
+/**
+ * Lightweight admin sidebar badge counts. Uses Firestore server-side count
+ * aggregation so we don't download every message/comment on each admin page
+ * render (which getMessages()/getAllComments() would).
+ */
+export const getAdminBadgeCounts = cache(
+  async (): Promise<{ unreadMessages: number; pendingComments: number }> => {
+    try {
+      const [unreadSnap, pendingSnap] = await Promise.all([
+        getCountFromServer(query(collection(db, "messages"), where("read", "==", false))),
+        getCountFromServer(query(collection(db, "comments"), where("approved", "==", false))),
+      ]);
+      return {
+        unreadMessages: unreadSnap.data().count,
+        pendingComments: pendingSnap.data().count,
+      };
+    } catch (error) {
+      console.error("Error fetching admin badge counts:", error);
+      return { unreadMessages: 0, pendingComments: 0 };
+    }
+  }
+);

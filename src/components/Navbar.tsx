@@ -64,12 +64,12 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            <a href="/" onClick={handleLogoClick} className="flex items-center gap-2 group z-50 cursor-pointer">
+            <Link href="/" onClick={handleLogoClick} className="flex items-center gap-2 group z-50 cursor-pointer">
               <img src="/logo.png" alt="Abhash Logo" className="h-8 w-auto object-contain" />
               <span className="text-xl sm:text-2xl font-black tracking-tighter transition-colors duration-300" style={{ color: "var(--text-primary)" }}>
                 ABHASH
               </span>
-            </a>
+            </Link>
             
             <div className="hidden md:flex items-center gap-8 lg:gap-10">
               {navItems.map((item) => (

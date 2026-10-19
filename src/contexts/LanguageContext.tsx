@@ -141,7 +141,7 @@ export const translations = {
       certs: "資格",
     },
     footer: {
-      rights: "All rights reserved。",
+      rights: "無断転載を禁じます。",
     },
     portfolioDetail: {
       visitLive: "ライブサイトを見る",
@@ -198,10 +198,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    // Hydration guard: the saved language is only available after mount so
+    // the SSR HTML always renders English and can't mismatch on the client.
     const saved = localStorage.getItem("lang") as Language;
     if (saved === "en" || saved === "ja") setLangState(saved);
     setMounted(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
+
+  // Keep <html lang> in sync so screen readers and search engines see the
+  // active language instead of a hardcoded "en".
+  useEffect(() => {
+    document.documentElement.lang = mounted ? lang : "en";
+  }, [lang, mounted]);
 
   const setLang = (l: Language) => {
     setLangState(l);

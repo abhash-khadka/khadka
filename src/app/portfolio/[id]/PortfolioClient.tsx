@@ -12,7 +12,7 @@ export default function PortfolioClient({ project, comments }: { project: Portfo
   const overview = (project[`overview_${lang}` as keyof PortfolioItem] as string) || project.overview_en;
 
   return (
-    <main className="pt-32 pb-24 px-6 min-h-screen bg-background text-foreground">
+    <div className="pt-32 pb-24 px-6 min-h-screen bg-background text-foreground">
       <div className="container mx-auto max-w-4xl">
         <Link href="/portfolio" className="text-sm font-medium transition-colors flex items-center mb-10" style={{ color: "var(--color-accent)" }}>
           <span className="mr-2">←</span> {lang === "ja" ? "作品一覧に戻る" : "Back to portfolio"}
@@ -124,6 +124,6 @@ export default function PortfolioClient({ project, comments }: { project: Portfo
         />
 
       </div>
-    </main>
+    </div>
   );
 }

@@ -34,8 +34,17 @@ yarn-error.log*
 .env*
 !.env.example
 
-# vercel
+# vercel & ide tools
 .vercel
+.opencode/
+
+# serwist service worker build artifacts (regenerated on build)
+/public/sw.js
+/public/swe-worker*.js
+
+# dev test pages
+/test.html
+/meta_test.html
 
 # typescript
 *.tsbuildinfo

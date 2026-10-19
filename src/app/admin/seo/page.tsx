@@ -13,7 +13,7 @@ export default async function AdminSeoPage() {
     <div className="max-w-5xl">
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-white mb-2">Global SEO Settings</h1>
-        <p className="text-gray-500 text-sm">Update your site's global meta tags to improve Search Engine Optimization (SEO) for both English and Japanese.</p>
+        <p className="text-gray-500 text-sm">Update your site&apos;s global meta tags to improve Search Engine Optimization (SEO) for both English and Japanese.</p>
       </div>
       
       <Suspense fallback={null}>

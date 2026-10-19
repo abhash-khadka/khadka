@@ -11,7 +11,7 @@ export default function BlogClient({ post, comments }: { post: BlogPost, comment
   const content = post[`content_${lang}` as keyof BlogPost] as string || post.content_en;
 
   return (
-    <main className="pt-32 pb-24 px-6 min-h-screen bg-background text-foreground">
+    <div className="pt-32 pb-24 px-6 min-h-screen bg-background text-foreground">
       <div className="container mx-auto max-w-4xl">
         <Link href="/blogs" className="text-sm font-medium transition-colors flex items-center mb-10" style={{ color: "var(--color-accent)" }}>
           <span className="mr-2">←</span> {t.blogDetail.backToPosts}
@@ -60,6 +60,6 @@ export default function BlogClient({ post, comments }: { post: BlogPost, comment
           comments={comments} 
         />
       </div>
-    </main>
+    </div>
   );
 }

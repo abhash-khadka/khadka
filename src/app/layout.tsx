@@ -46,6 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // other locales.
     alternates: {
       canonical: "https://abhashkhadka.com.np",
+      types: { "application/rss+xml": "/rss.xml" },
       languages: {
         "en": "https://abhashkhadka.com.np",
         "ja": "https://abhashkhadka.com.np",

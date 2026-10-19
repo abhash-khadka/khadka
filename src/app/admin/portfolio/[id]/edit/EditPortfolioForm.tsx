@@ -5,12 +5,13 @@ import RichTextEditor from "@/components/RichTextEditor";
 import { useState } from "react";
 import TranslateButton from "@/components/TranslateButton";
 import { translateText } from "@/lib/actions";
+import { PortfolioItem } from "@/lib/data";
 
 const categories = ["Web", "Mobile", "Design", "AI"];
 
 type Lang = "en" | "ja";
 
-export default function EditPortfolioForm({ item, action }: { item: any; action: (payload: FormData) => void }) {
+export default function EditPortfolioForm({ item, action }: { item: PortfolioItem; action: (payload: FormData) => void }) {
   const [lang, setLang] = useState<Lang>("en");
   
   const [title_en, setTitleEn] = useState(item.title_en || "");

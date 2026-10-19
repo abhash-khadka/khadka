@@ -66,6 +66,8 @@ export default function RichTextEditor({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    // Hydration guard: the Tiptap editor must only render on the client
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

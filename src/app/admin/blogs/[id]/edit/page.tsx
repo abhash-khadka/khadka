@@ -24,7 +24,9 @@ export default async function EditBlogPostPage({ params }: { params: Promise<{ i
         </div>
       </div>
 
-      <BlogForm post={post} action={action} isEdit={true} />
+      {/* key forces a remount when navigating between different posts so the
+          lazily-initialized field state re-initializes for the new post */}
+      <BlogForm key={post.id} post={post} action={action} isEdit={true} />
     </div>
   );
 }

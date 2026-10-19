@@ -1,4 +1,5 @@
 import { getData, getMessages } from "@/lib/data";
+import { getAiConfigSummary } from "@/lib/ai";
 import Link from "next/link";
 
 const BlogIcon = () => (
@@ -31,10 +32,17 @@ const LandingIcon = () => (
   </svg>
 );
 
+const SparklesIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+  </svg>
+);
+
 export default async function AdminDashboard() {
-  const [data, messages] = await Promise.all([
+  const [data, messages, aiSummary] = await Promise.all([
     getData(),
     getMessages(),
+    getAiConfigSummary(),
   ]);
 
   const unreadMessages = messages ? messages.filter((m) => !m.read).length : 0;
@@ -72,7 +80,7 @@ export default async function AdminDashboard() {
       {/* Quick Actions */}
       <div className="mb-10">
         <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link href="/admin/blogs/new" className="flex items-center gap-3 bg-[#111111] border border-gray-800 p-5 rounded-sm hover:border-[#c9a84c]/30 transition-colors">
             <span className="text-[#c9a84c] bg-[#c9a84c]/10 p-2 rounded-sm shrink-0"><PlusIcon /></span>
             <div>
@@ -92,6 +100,16 @@ export default async function AdminDashboard() {
             <div>
               <p className="text-white text-sm font-semibold">Edit Landing Page</p>
               <p className="text-gray-500 text-xs">Update hero text, about section</p>
+            </div>
+          </Link>
+          <Link href="/admin/ai" className="flex items-center gap-3 bg-[#111111] border border-gray-800 p-5 rounded-sm hover:border-[#c9a84c]/30 transition-colors">
+            <span className="text-[#c9a84c] bg-[#c9a84c]/10 p-2 rounded-sm shrink-0"><SparklesIcon /></span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="text-white text-sm font-semibold">AI & Translation</p>
+                <span className={`w-1.5 h-1.5 rounded-full ${aiSummary.hasConfiguredKey ? "bg-emerald-400" : "bg-amber-400"}`}></span>
+              </div>
+              <p className="text-gray-500 text-xs truncate">Model: {aiSummary.primaryModel}</p>
             </div>
           </Link>
         </div>

@@ -28,6 +28,8 @@ export default function BlogInteractions({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Hydration guard: localStorage only readable after mount (SSR renders unliked state)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasLiked(localStorage.getItem(`liked_${type}_${slug}`) === "true");
     }
   }, [slug, type]);
@@ -82,74 +84,6 @@ export default function BlogInteractions({
   const getReplies = (parentId: number) => {
     return comments.filter(c => c.parentId === parentId);
   };
-
-  const CommentForm = ({ parentId = null }: { parentId?: number | null }) => (
-    <div className={`rounded-md ${parentId ? 'mt-4' : 'p-6 border'} transition-all`} style={{ background: parentId ? 'transparent' : 'var(--bg-card)', borderColor: "var(--border-color)" }}>
-      {!parentId && (
-        <h4 className="font-bold text-lg mb-4" style={{ color: "var(--text-primary)" }}>
-          {t.blogInteractions.addComment}
-        </h4>
-      )}
-      
-      {commentStatus === "pendingApproval" ? (
-        <div className="p-4 rounded text-sm text-center font-medium" style={{ background: "var(--bg-secondary)", color: "var(--color-accent)" }}>
-          {t.blogInteractions.pendingApproval}
-        </div>
-      ) : (
-        <form action={submitComment} className="space-y-4">
-          {parentId && <input type="hidden" name="parentId" value={parentId} />}
-          <div>
-            <input 
-              type="text" 
-              name="name" 
-              required
-              placeholder={t.blogInteractions.namePlaceholder}
-              className="w-full px-4 py-3 rounded-sm border focus:outline-none transition-colors"
-              style={{ 
-                background: "var(--bg-secondary)", 
-                borderColor: "var(--border-color)",
-                color: "var(--text-primary)"
-              }}
-            />
-          </div>
-          <div>
-            <textarea 
-              name="content" 
-              required
-              rows={3}
-              placeholder={t.blogInteractions.commentPlaceholder}
-              className="w-full px-4 py-3 rounded-sm border focus:outline-none transition-colors resize-y"
-              style={{ 
-                background: "var(--bg-secondary)", 
-                borderColor: "var(--border-color)",
-                color: "var(--text-primary)"
-              }}
-            ></textarea>
-          </div>
-          <div className="flex gap-3">
-            <button 
-              type="submit"
-              disabled={isPendingComment}
-              className="px-6 py-2 font-semibold text-sm rounded-sm transition-all disabled:opacity-50"
-              style={{ background: "var(--color-accent)", color: "var(--bg-primary)" }}
-            >
-              {isPendingComment ? t.blogInteractions.submitting : t.blogInteractions.submit}
-            </button>
-            {parentId && (
-              <button 
-                type="button"
-                onClick={() => setReplyingTo(null)}
-                className="px-6 py-2 font-semibold text-sm rounded-sm transition-all border"
-                style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}
-              >
-                {t.blogInteractions.cancelReply}
-              </button>
-            )}
-          </div>
-        </form>
-      )}
-    </div>
-  );
 
   return (
     <div className="mt-16 pt-8 border-t" style={{ borderColor: "var(--border-color)" }}>
@@ -214,7 +148,14 @@ export default function BlogInteractions({
                   </button>
                   
                   {replyingTo === comment.id && (
-                    <CommentForm parentId={comment.id} />
+                    <CommentForm
+                      parentId={comment.id}
+                      t={t}
+                      commentStatus={commentStatus}
+                      onSubmit={submitComment}
+                      isPending={isPendingComment}
+                      onCancelReply={() => setReplyingTo(null)}
+                    />
                   )}
                 </div>
 
@@ -241,8 +182,100 @@ export default function BlogInteractions({
         )}
 
         {/* Top-Level Comment Form */}
-        <CommentForm />
+        <CommentForm
+          t={t}
+          commentStatus={commentStatus}
+          onSubmit={submitComment}
+          isPending={isPendingComment}
+        />
       </div>
+    </div>
+  );
+}
+
+// Defined at module scope (not inside the parent) so React keeps its identity
+// between renders — a nested definition remounts on every keystroke and the
+// input loses focus.
+function CommentForm({
+  parentId = null,
+  t,
+  commentStatus,
+  onSubmit,
+  isPending,
+  onCancelReply,
+}: {
+  parentId?: number | null;
+  t: ReturnType<typeof useLanguage>["t"];
+  commentStatus: "idle" | "pendingApproval";
+  onSubmit: (formData: FormData) => void;
+  isPending: boolean;
+  onCancelReply?: () => void;
+}) {
+  return (
+    <div className={`rounded-md ${parentId ? 'mt-4' : 'p-6 border'} transition-all`} style={{ background: parentId ? 'transparent' : 'var(--bg-card)', borderColor: "var(--border-color)" }}>
+      {!parentId && (
+        <h4 className="font-bold text-lg mb-4" style={{ color: "var(--text-primary)" }}>
+          {t.blogInteractions.addComment}
+        </h4>
+      )}
+      
+      {commentStatus === "pendingApproval" ? (
+        <div className="p-4 rounded text-sm text-center font-medium" style={{ background: "var(--bg-secondary)", color: "var(--color-accent)" }}>
+          {t.blogInteractions.pendingApproval}
+        </div>
+      ) : (
+        <form action={onSubmit} className="space-y-4">
+          {parentId && <input type="hidden" name="parentId" value={parentId} />}
+          <div>
+            <input 
+              type="text" 
+              name="name" 
+              required
+              placeholder={t.blogInteractions.namePlaceholder}
+              className="w-full px-4 py-3 rounded-sm border focus:outline-none transition-colors"
+              style={{ 
+                background: "var(--bg-secondary)", 
+                borderColor: "var(--border-color)",
+                color: "var(--text-primary)"
+              }}
+            />
+          </div>
+          <div>
+            <textarea 
+              name="content" 
+              required
+              rows={3}
+              placeholder={t.blogInteractions.commentPlaceholder}
+              className="w-full px-4 py-3 rounded-sm border focus:outline-none transition-colors resize-y"
+              style={{ 
+                background: "var(--bg-secondary)", 
+                borderColor: "var(--border-color)",
+                color: "var(--text-primary)"
+              }}
+            ></textarea>
+          </div>
+          <div className="flex gap-3">
+            <button 
+              type="submit"
+              disabled={isPending}
+              className="px-6 py-2 font-semibold text-sm rounded-sm transition-all disabled:opacity-50"
+              style={{ background: "var(--color-accent)", color: "var(--bg-primary)" }}
+            >
+              {isPending ? t.blogInteractions.submitting : t.blogInteractions.submit}
+            </button>
+            {parentId && (
+              <button 
+                type="button"
+                onClick={onCancelReply}
+                className="px-6 py-2 font-semibold text-sm rounded-sm transition-all border"
+                style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}
+              >
+                {t.blogInteractions.cancelReply}
+              </button>
+            )}
+          </div>
+        </form>
+      )}
     </div>
   );
 }

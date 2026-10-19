@@ -1,25 +1,23 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SaveAlert from "@/components/SaveAlert";
 
 export default function SaveNotification({ message }: { message: string }) {
   const searchParams = useSearchParams();
-  const [show, setShow] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
-  useEffect(() => {
-    if (searchParams.get("saved") === "1") {
-      setShow(true);
-    }
-  }, [searchParams]);
+  // Derived from the URL instead of state+effect: the alert shows while
+  // ?saved=1 is present and hides once dismissed (which clears the param).
+  const show = searchParams.get("saved") === "1";
 
   if (!show) return null;
 
   return (
     <SaveAlert
       message={message}
-      onDismiss={() => setShow(false)}
+      onDismiss={() => router.replace(pathname)}
     />
   );
 }

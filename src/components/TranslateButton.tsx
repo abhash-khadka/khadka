@@ -18,9 +18,18 @@ export default function TranslateButton({
 
   const handleTranslate = async () => {
     setLoading(true);
-    const translatedText = await translateText(text, sourceLanguage, targetLanguage);
-    onTranslated(translatedText);
-    setLoading(false);
+    try {
+      const translatedText = await translateText(text, sourceLanguage, targetLanguage);
+      if (translatedText.startsWith("Error:")) {
+        alert(translatedText);
+      } else {
+        onTranslated(translatedText);
+      }
+    } catch (err) {
+      alert("Translation error: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
